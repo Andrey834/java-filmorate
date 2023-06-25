@@ -68,15 +68,17 @@ class FilmsControllerTest extends FilmorateApplicationTests {
     @Test
     void addFilm() throws Exception {
         MvcResult mvcResult = sendPost(film1).andExpect(status().is2xxSuccessful()).andReturn();
+        String responseBody = mvcResult.getResponse().getContentAsString();
+
 
         Film expectedFilm = film1;
-        Film actualFilm = filmResponse(mvcResult);
+        Film actualFilm = objectMapper.readValue(responseBody, Film.class);
 
         assertEquals(expectedFilm, actualFilm, "Expected film1 is different");
     }
 
     @Test
-    void WhenNameIsEmpty() throws Exception {
+    void whenNameIsEmpty() throws Exception {
         List<String> emptyNames = List.of(
                 "  ",
                 " ",
@@ -95,7 +97,7 @@ class FilmsControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenDescriptionLength200Char() throws Exception {
+    void whenDescriptionLength200Char() throws Exception {
         film1.setDescription("a".repeat(200));
 
         sendPost(film1).andExpect(status().is2xxSuccessful());
@@ -107,7 +109,7 @@ class FilmsControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenDescriptionLength201Char() throws Exception {
+    void whenDescriptionLength201Char() throws Exception {
         film1.setDescription("a".repeat(201));
 
         sendPost(film1).andExpect(status().is4xxClientError());
@@ -139,8 +141,8 @@ class FilmsControllerTest extends FilmorateApplicationTests {
 
         assertEquals(expectedSizeList, actualSizeList, "List size should be 1");
 
-        LocalDate ValidDate = minValidDate.plusDays(1);
-        film2.setReleaseDate(ValidDate);
+        LocalDate validDate = minValidDate.plusDays(1);
+        film2.setReleaseDate(validDate);
 
         sendPost(film2).andExpect(status().is2xxSuccessful());
 
@@ -293,10 +295,5 @@ class FilmsControllerTest extends FilmorateApplicationTests {
 
     private ResultActions sendGet() throws Exception {
         return mockMvc.perform(get("/films").contentType(MediaType.APPLICATION_JSON));
-    }
-
-    private Film filmResponse (MvcResult result) throws UnsupportedEncodingException, JsonProcessingException {
-        String film = result.getResponse().getContentAsString();
-        return objectMapper.readValue(film, Film.class);
     }
 }
