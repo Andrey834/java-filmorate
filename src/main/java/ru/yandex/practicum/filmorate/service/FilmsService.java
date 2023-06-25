@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,7 @@ public class FilmsService {
         return film;
     }
 
-    public Film updateFilm(Film film) throws IncorrectIdException {
+    public Film updateFilm(@Valid Film film) throws IncorrectIdException {
         if (checkFilm(film)) {
             final Integer idFilm = film.getId();
             films.put(idFilm, film);

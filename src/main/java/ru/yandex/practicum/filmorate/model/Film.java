@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-
-import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.validator.ReleaseValidator;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Data

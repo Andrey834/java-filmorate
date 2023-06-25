@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.IncorrectIdException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,12 +15,11 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-//@Validated
 public class UsersService {
     private static final Map<Integer, User> users = new HashMap<>();
     private static Integer id = 0;
 
-    public User addUser(User user) {
+    public User addUser(@Valid User user) {
         final Integer idUser = generateId();
         user.setId(idUser);
         user.checkName();
@@ -27,7 +27,7 @@ public class UsersService {
         return user;
     }
 
-    public User updateUser(User user) {
+    public User updateUser(@Valid User user) {
         if (checkUser(user)) {
             final Integer idUser = user.getId();
             user.checkName();
