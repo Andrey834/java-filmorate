@@ -13,9 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.yandex.practicum.filmorate.FilmorateApplicationTests;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FilmsService;
 import ru.yandex.practicum.filmorate.service.UsersService;
 
 import java.time.LocalDate;
@@ -23,7 +21,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -34,7 +31,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     @Autowired
     private UsersService service;
     ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    ;
+
     private User user1;
     private User user2;
 
@@ -71,7 +68,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenAddUserWithNotValidEmailThenUserShouldNotBeAdded() throws Exception {
+    void whenAddUserWithNotValidEmailThenUserShouldNotBeAdded() throws Exception {
         List<String> incorrectlyEmails = List.of(
           "@example.com",
           "example@example.com@",
@@ -91,7 +88,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenAddUserWithNotValidLoginThenUserShouldNotBeAdded() throws Exception {
+    void whenAddUserWithNotValidLoginThenUserShouldNotBeAdded() throws Exception {
         List<String> incorrectlyLogins = List.of(
                 " ",
                 "",
@@ -108,7 +105,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenAddUserWithEmptyNameThenNameShouldBeSameLogin() throws Exception {
+    void whenAddUserWithEmptyNameThenNameShouldBeSameLogin() throws Exception {
         List<String> emptyName = List.of(
                 "",
                 " "
@@ -131,7 +128,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenAddUserWithFutureBirthdayThenThenUserShouldNotBeAdded() throws Exception {
+    void whenAddUserWithFutureBirthdayThenThenUserShouldNotBeAdded() throws Exception {
         LocalDate futureDate = LocalDate.now().plusDays(1);
         user1.setBirthday(futureDate);
 
@@ -169,7 +166,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenUpdateUserWithNotValidEmailThenUserShouldNotBeUpdate() throws Exception {
+    void whenUpdateUserWithNotValidEmailThenUserShouldNotBeUpdate() throws Exception {
         String responseBody = sendPost(user1)
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
@@ -198,7 +195,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenUpdateUserWithEmptyLoginThenUserShouldNotBeUpdate() throws Exception {
+    void whenUpdateUserWithEmptyLoginThenUserShouldNotBeUpdate() throws Exception {
         String responseBody = sendPost(user1)
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
@@ -222,7 +219,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenUpdateUserWithEmptyNameThenNameShouldBeSameLogin() throws Exception {
+    void whenUpdateUserWithEmptyNameThenNameShouldBeSameLogin() throws Exception {
         String responseBody = sendPost(user1)
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
@@ -258,7 +255,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     }
 
     @Test
-    void WhenUpdateUserWithFutureDateThenUserShouldNotBeAdded() throws Exception {
+    void whenUpdateUserWithFutureDateThenUserShouldNotBeAdded() throws Exception {
         String responseBody = sendPost(user1)
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
