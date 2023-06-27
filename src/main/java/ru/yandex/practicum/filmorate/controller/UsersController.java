@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/films")
+@RequestMapping("/users")
 @AllArgsConstructor
 @Slf4j
 public class UsersController {
