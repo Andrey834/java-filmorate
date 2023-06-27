@@ -13,10 +13,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmsServiceTest extends FilmorateApplicationTests {
-    Film film1;
-    Film film2;
-    FilmsService service;
-    Map<Integer, Film> films;
+    private Film film1;
+    private Film film2;
+    private FilmsService service;
+    private Map<Integer, Film> films;
 
     @BeforeEach
     public void setUp() {

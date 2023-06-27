@@ -9,23 +9,23 @@ import ru.yandex.practicum.filmorate.service.UsersService;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+@RestController("/users")
 @AllArgsConstructor
 @Slf4j
 public class UsersController {
     private UsersService users;
 
-    @PostMapping("/users")
+    @PostMapping
     public User addFilm(@Valid @RequestBody User user) {
         return users.addUser(user);
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User updateFilm(@Valid @RequestBody User user) {
         return users.updateUser(user);
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getFilms() {
         return users.getUsers();
     }

@@ -13,11 +13,11 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UsersServiceTest extends FilmorateApplicationTests {
-    User user1;
-    User user2;
-    User user3;
-    UsersService service;
-    Map<Integer, User> users;
+    private User user1;
+    private User user2;
+    private User user3;
+    private UsersService service;
+    private Map<Integer, User> users;
 
     @BeforeEach
     public void setUp() {

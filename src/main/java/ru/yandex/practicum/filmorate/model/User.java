@@ -17,13 +17,17 @@ import java.time.LocalDate;
 @EqualsAndHashCode(exclude = {"id", "name", "birthday"})
 public class User {
     private Integer id;
+
     @Email(message = "Wrong format Email")
     @NotBlank(message = "Email cannot be empty")
     private String email;
+
     @NotBlank(message = "Login cannot be empty")
     @LoginValidator
     private String login;
+
     private String name;
+
     @Past
     private LocalDate birthday;
 

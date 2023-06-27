@@ -30,7 +30,7 @@ class UsersControllerTest extends FilmorateApplicationTests {
     MockMvc mockMvc;
     @Autowired
     private UsersService service;
-    ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private User user1;
     private User user2;

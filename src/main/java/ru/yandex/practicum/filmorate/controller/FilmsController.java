@@ -9,23 +9,23 @@ import ru.yandex.practicum.filmorate.service.FilmsService;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+@RestController("/films")
 @AllArgsConstructor
 @Slf4j
 public class FilmsController {
     private FilmsService films;
 
-    @PostMapping("/films")
+    @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         return films.addFilm(film);
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         return films.updateFilm(film);
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> getFilms() {
         return films.getFilms();
     }
