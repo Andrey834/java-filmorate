@@ -21,8 +21,8 @@ public class FilmController {
     @PostMapping()
     public Film createFilm(@RequestBody Film film, HttpServletRequest request) {
         if (film == null) throw new ValidationException("Film is null");
-        validation(film);
         film.setId(getNextId());
+        validation(film);
         films.put(film.getId(), film);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
@@ -60,9 +60,11 @@ public class FilmController {
     }
 
     private void update(Film film) {
-        boolean found = false;
+/*        boolean found = false;
         if (films.containsKey(film.getId())) films.put(film.getId(),film);
         else films.put(getNextId(), film);
-        if (!found) films.put(getNextId(), film);
+        if (!found) films.put(getNextId(), film);*/
+        if (films.containsKey(film.getId())) films.put(film.getId(), film);
+        else throw new ValidationException("Incorrect Id");
     }
 }

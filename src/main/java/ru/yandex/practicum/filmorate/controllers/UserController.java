@@ -22,8 +22,8 @@ public class UserController {
     @PostMapping()
     public User createUser(@Valid @RequestBody User user, HttpServletRequest request) {
         if (user == null) throw new ValidationException("User is null");
-        validation(user);
         user.setId(getNextId());
+        validation(user);
         users.put(user.getId(), user);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
@@ -61,8 +61,16 @@ public class UserController {
     }
 
     private void update(User user) {
+        //boolean found = false;
         if (users.containsKey(user.getId())) users.put(user.getId(), user);
-        else users.put(getNextId(), user);
+         else throw new ValidationException("Incorrect Id");
+/*        for (Map.Entry<Integer, User> values : users.entrySet()) {
+            if (values.getValue().getId() == user.getId()) {
+                users.put(getNextId(), user);
+                found = true;
+            }
+        }
+        if (!found) users.put(getNextId(), user);*/
     }
 
     //без этой валидации не проходит тестирование, хотя через постман отрабатывает все ок. Думаю что в постмане
