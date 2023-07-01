@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class User {
 
-    private int id;
+    private Integer id;
 
     @NonNull
     @Email
@@ -20,7 +20,6 @@ public class User {
     @NonNull
     private String login;
 
-    @NonNull
     private String name;
 
     @NonNull

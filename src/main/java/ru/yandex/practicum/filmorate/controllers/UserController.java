@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -22,8 +20,8 @@ public class UserController {
     @PostMapping()
     public User createUser(@Valid @RequestBody User user, HttpServletRequest request) {
         if (user == null) throw new ValidationException("User is null");
-        user.setId(getNextId());
         validation(user);
+        user.setId(getNextId());
         users.put(user.getId(), user);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
@@ -33,7 +31,6 @@ public class UserController {
     @PutMapping()
     public User updateUser(@Valid @RequestBody User user, HttpServletRequest request) {
         if (user == null) throw new ValidationException("User is null");
-        validation(user);
         update(user);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
@@ -41,8 +38,8 @@ public class UserController {
     }
 
     @GetMapping()
-    public Collection<User> getUsers() {
-        return users.values();
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
     }
 
     private int getNextId() {
@@ -56,14 +53,13 @@ public class UserController {
         if (user.getLogin().contains(" ")) throw new ValidationException("Incorrect login");
         if (user.getBirthday().isAfter(LocalDate.now()))
             throw new ValidationException("Date of birth cannot be in future");
-        if (user.getName().isBlank()) user.setName(user.getLogin());
-        if (user.getId() < 1) throw new ValidationException("Incorrect Id"); // возможно не нужно
+        if (user.getName() == null) user.setName(user.getLogin());
+        if (user.getName().isBlank())
+            user.setName(user.getLogin()); // не понимаю почему не отрабатывает эта строка на null
     }
 
     private void update(User user) {
         //boolean found = false;
-        if (users.containsKey(user.getId())) users.put(user.getId(), user);
-         else throw new ValidationException("Incorrect Id");
 /*        for (Map.Entry<Integer, User> values : users.entrySet()) {
             if (values.getValue().getId() == user.getId()) {
                 users.put(getNextId(), user);
@@ -71,6 +67,10 @@ public class UserController {
             }
         }
         if (!found) users.put(getNextId(), user);*/
+        if (users.containsKey(user.getId())) {
+            validation(user);
+            users.put(user.getId(), user);
+        } else throw new ValidationException("Incorrect Id");
     }
 
     //без этой валидации не проходит тестирование, хотя через постман отрабатывает все ок. Думаю что в постмане
