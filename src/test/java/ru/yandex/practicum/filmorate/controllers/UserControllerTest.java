@@ -75,7 +75,7 @@ class UserControllerTest {
     @Test
     public void testCreateUser_IncorrectId_ThrowsValidationException() {
         testUser.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.updateUser(testUser, request));
         assertEquals("Incorrect Id", exception.getMessage());
     }
 

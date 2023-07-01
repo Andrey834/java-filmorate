@@ -66,7 +66,7 @@ class FilmControllerTest {
     @Test
     public void testCreateFilm_IncorrectId_ThrowsValidationException() {
         testFilm.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.updateFilm(testFilm, request));
         assertEquals("Incorrect Id", exception.getMessage());
     }
 
