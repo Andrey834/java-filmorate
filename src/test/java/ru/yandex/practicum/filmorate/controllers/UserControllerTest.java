@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,45 +33,35 @@ class UserControllerTest {
     @Test
     public void testCreateUser_BlankEmail_ThrowsValidationException() {
         testUser.setEmail("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createUser(testUser, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
     public void testCreateUser_EmailContainsSymbol_ThrowsValidationException() {
         testUser.setEmail("memelover@gmail.com@");
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createUser(testUser, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
     public void testCreateUser_BlankLogin_ThrowsValidationException() {
         testUser.setLogin("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createUser(testUser, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
     public void testCreateUser_LoginContainsSpaces_ThrowsValidationException() {
         testUser.setLogin("Super JavaProgrammer2000");
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createUser(testUser, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
     public void testCreateUser_BirthdayDateAfterCurrentDate_ThrowsValidationException() {
         testUser.setBirthday(LocalDate.now().plusDays(1));
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createUser(testUser, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Date of birth cannot be in future", exception.getMessage());
     }
 
@@ -84,9 +75,7 @@ class UserControllerTest {
     @Test
     public void testCreateUser_IncorrectId_ThrowsValidationException() {
         testUser.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createUser(testUser, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect Id", exception.getMessage());
     }
 
@@ -104,7 +93,7 @@ class UserControllerTest {
         users.put(2, testUser2);
 
         test.createUser(testUser, request);
-        test.createUser(testUser2,request);
+        test.createUser(testUser2, request);
 
         Collection<User> result = test.getUsers();
         assertTrue(result.containsAll(users.values()));

@@ -34,9 +34,7 @@ class FilmControllerTest {
     @Test
     public void testCreateFilm_BlankEmail_ThrowsValidationException() {
         testFilm.setName("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createFilm(testFilm, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect name", exception.getMessage());
     }
 
@@ -47,36 +45,28 @@ class FilmControllerTest {
                 "- at the end of it there will be a real mayhem. Traveling through their picturesque world and talking" +
                 " in gibberish is all they have, and most importantly, they never know what troubles await them" +
                 " in the next second.");
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createFilm(testFilm, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect length", exception.getMessage());
     }
 
     @Test
     public void testCreateFilm_DurationLessThan0_ThrowsValidationException() {
         testFilm.setDuration(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createFilm(testFilm, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect duration", exception.getMessage());
     }
 
     @Test
     public void testCreateFilm_IncorrectReleaseDate_ThrowsValidationException() {
-        testFilm.setReleaseDate( LocalDate.of(1895, 12, 27));
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createFilm(testFilm, request);
-        });
+        testFilm.setReleaseDate(LocalDate.of(1895, 12, 27));
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect release date", exception.getMessage());
     }
 
     @Test
     public void testCreateFilm_IncorrectId_ThrowsValidationException() {
         testFilm.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            test.createFilm(testFilm, request);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect Id", exception.getMessage());
     }
 
