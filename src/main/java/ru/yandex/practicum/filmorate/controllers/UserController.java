@@ -53,9 +53,7 @@ public class UserController {
         if (user.getLogin().contains(" ")) throw new ValidationException("Incorrect login");
         if (user.getBirthday().isAfter(LocalDate.now()))
             throw new ValidationException("Date of birth cannot be in future");
-        if (user.getName() == null) user.setName(user.getLogin());
-        if (user.getName().isBlank())
-            user.setName(user.getLogin()); // не понимаю почему не отрабатывает эта строка на null
+        if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
     }
 
     private void update(User user) {
