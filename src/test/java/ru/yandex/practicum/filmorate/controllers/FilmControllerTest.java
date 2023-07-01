@@ -28,7 +28,8 @@ class FilmControllerTest {
                 "animated flash series about the adventures of several animals",
                 LocalDate.of(1999, 12, 24),
                 5
-        );}
+        );
+    }
 
     @Test
     public void testCreateFilm_BlankEmail_ThrowsValidationException() {
