@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,7 +13,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@SpringBootTest
 class UserControllerTest {
     private User testUser;
     UserController test = new UserController();
@@ -31,56 +29,56 @@ class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser_BlankEmail_ThrowsValidationException() {
+    public void BlankEmailTest_ThrowsValidationException() {
         testUser.setEmail("");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
-    public void testCreateUser_EmailContainsSymbol_ThrowsValidationException() {
+    public void EmailContainsSymbolTest_ThrowsValidationException() {
         testUser.setEmail("memelover@gmail.com@");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
-    public void testCreateUser_BlankLogin_ThrowsValidationException() {
+    public void BlankLoginTest_ThrowsValidationException() {
         testUser.setLogin("");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
-    public void testCreateUser_LoginContainsSpaces_ThrowsValidationException() {
+    public void LoginContainsSpacesTest_ThrowsValidationException() {
         testUser.setLogin("Super JavaProgrammer2000");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
-    public void testCreateUser_BirthdayDateAfterCurrentDate_ThrowsValidationException() {
+    public void BirthdayDateAfterCurrentDateTest_ThrowsValidationException() {
         testUser.setBirthday(LocalDate.now().plusDays(1));
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Date of birth cannot be in future", exception.getMessage());
     }
 
     @Test
-    public void testCreateUser_BlankName_ThrowsValidationException() {
+    public void BlankNameTest_ThrowsValidationException() {
         testUser.setName("");
         test.createUser(testUser, request);
         assertEquals(testUser.getName(), testUser.getLogin());
     }
 
     @Test
-    public void testCreateUser_IncorrectId_ThrowsValidationException() {
+    public void IncorrectIdTest_ThrowsValidationException() {
         testUser.setId(-1);
         ValidationException exception = assertThrows(ValidationException.class, () -> test.updateUser(testUser, request));
-        assertEquals("Incorrect Id", exception.getMessage());
+        assertEquals("Incorrect id", exception.getMessage());
     }
 
     @Test
-    public void testGetUsers_ReturnsAllUsers() {
+    public void GetUsersTest_ReturnsAllUsers() {
         User testUser2 = new User(
                 2,
                 "beerlover@yandex.ru",

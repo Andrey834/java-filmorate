@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class User {
 
-    private Integer id;
+    private int id;
 
     @NonNull
     @Email

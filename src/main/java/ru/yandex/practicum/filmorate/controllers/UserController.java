@@ -47,33 +47,36 @@ public class UserController {
     }
 
     private void validation(User user) {
-        if (user.getEmail().isBlank() || !user.getEmail().contains("@") || !isValidEmail(user.getEmail()))
+        if (user.getEmail() == null
+                || user.getEmail().isBlank()
+                || !isValidEmail(user.getEmail())) {
+            log.error("ValidationException: incorrect email");
             throw new ValidationException("Incorrect email");
-        if (user.getLogin().isBlank()) throw new ValidationException("Incorrect login");
-        if (user.getLogin().contains(" ")) throw new ValidationException("Incorrect login");
-        if (user.getBirthday().isAfter(LocalDate.now()))
+        }
+        if (user.getLogin() == null
+                || user.getLogin().isBlank()
+                || user.getLogin().contains(" ")) {
+            log.error("ValidationException: incorrect login");
+            throw new ValidationException("Incorrect login");
+        }
+        if (user.getBirthday() == null
+                || user.getBirthday().isAfter(LocalDate.now())) {
+            log.error("ValidationException: Date of birth cannot be in future");
             throw new ValidationException("Date of birth cannot be in future");
+        }
         if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
     }
 
     private void update(User user) {
-        //boolean found = false;
-/*        for (Map.Entry<Integer, User> values : users.entrySet()) {
-            if (values.getValue().getId() == user.getId()) {
-                users.put(getNextId(), user);
-                found = true;
-            }
-        }
-        if (!found) users.put(getNextId(), user);*/
         if (users.containsKey(user.getId())) {
             validation(user);
             users.put(user.getId(), user);
-        } else throw new ValidationException("Incorrect Id");
+        } else {
+            log.error("ValidationException: incorrect id");
+            throw new ValidationException("Incorrect id");
+        }
     }
 
-    //без этой валидации не проходит тестирование, хотя через постман отрабатывает все ок. Думаю что в постмане
-    // при запросе проверка идет на уровне фреймворка, а при тестировании аннотации фреймворка пропускаются и поэтому невалидный
-    // емейл пропускался.
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
         return email.matches(emailRegex);

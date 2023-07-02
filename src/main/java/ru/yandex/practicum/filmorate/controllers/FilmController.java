@@ -49,21 +49,31 @@ public class FilmController {
     }
 
     private void validation(Film film) {
-        if (film.getName().isBlank()) throw new ValidationException("Incorrect name");
-        if (film.getDescription().length() > 200) throw new ValidationException("Incorrect length");
-        if (film.getDuration() < 0) throw new ValidationException("Incorrect duration");
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28)))
+        if (film.getName() == null || film.getName().isBlank()) {
+            log.error("ValidationException: incorrect name");
+            throw new ValidationException("Incorrect name");
+        }
+        if (film.getDescription() == null || film.getDescription().length() > 200) {
+            log.error("ValidationException: incorrect length");
+            throw new ValidationException("Incorrect length");
+        }
+        if (film.getDuration() < 0) {
+            log.error("ValidationException: incorrect duration");
+            throw new ValidationException("Incorrect duration");
+        }
+        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            log.error("ValidationException: incorrect release date");
             throw new ValidationException("Incorrect release date");
+        }
     }
 
     private void update(Film film) {
-/*        boolean found = false;
-        if (films.containsKey(film.getId())) films.put(film.getId(),film);
-        else films.put(getNextId(), film);
-        if (!found) films.put(getNextId(), film);*/
         if (films.containsKey(film.getId())) {
             validation(film);
             films.put(film.getId(), film);
-        } else throw new ValidationException("Incorrect Id");
+        } else {
+            log.error("ValidationException: incorrect id");
+            throw new ValidationException("Incorrect id");
+        }
     }
 }
