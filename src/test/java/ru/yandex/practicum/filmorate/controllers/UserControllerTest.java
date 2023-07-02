@@ -29,56 +29,56 @@ class UserControllerTest {
     }
 
     @Test
-    public void BlankEmailTest_ThrowsValidationException() {
+    public void testBlankEmail_ThrowsValidationException() {
         testUser.setEmail("");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
-    public void EmailContainsSymbolTest_ThrowsValidationException() {
+    public void testEmailContainsSymbol_ThrowsValidationException() {
         testUser.setEmail("memelover@gmail.com@");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
-    public void BlankLoginTest_ThrowsValidationException() {
+    public void testBlankLogin_ThrowsValidationException() {
         testUser.setLogin("");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
-    public void LoginContainsSpacesTest_ThrowsValidationException() {
+    public void testLoginContainsSpaces_ThrowsValidationException() {
         testUser.setLogin("Super JavaProgrammer2000");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
-    public void BirthdayDateAfterCurrentDateTest_ThrowsValidationException() {
+    public void testBirthdayDateAfterCurrentDate_ThrowsValidationException() {
         testUser.setBirthday(LocalDate.now().plusDays(1));
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createUser(testUser, request));
         assertEquals("Date of birth cannot be in future", exception.getMessage());
     }
 
     @Test
-    public void BlankNameTest_ThrowsValidationException() {
+    public void testBlankName_ThrowsValidationException() {
         testUser.setName("");
         test.createUser(testUser, request);
         assertEquals(testUser.getName(), testUser.getLogin());
     }
 
     @Test
-    public void IncorrectIdTest_ThrowsValidationException() {
+    public void testIncorrectId_ThrowsValidationException() {
         testUser.setId(-1);
         ValidationException exception = assertThrows(ValidationException.class, () -> test.updateUser(testUser, request));
         assertEquals("Incorrect id", exception.getMessage());
     }
 
     @Test
-    public void GetUsersTest_ReturnsAllUsers() {
+    public void testGetUsers_ReturnsAllUsers() {
         User testUser2 = new User(
                 2,
                 "beerlover@yandex.ru",

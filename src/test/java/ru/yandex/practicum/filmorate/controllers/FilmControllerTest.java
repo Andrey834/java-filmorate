@@ -30,14 +30,14 @@ class FilmControllerTest {
     }
 
     @Test
-    public void BlankEmailTest_ThrowsValidationException() {
+    public void testBlankEmail_ThrowsValidationException() {
         testFilm.setName("");
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect name", exception.getMessage());
     }
 
     @Test
-    public void DescriptionBigLengthTest_ThrowsValidationException() {
+    public void testDescriptionBigLength_ThrowsValidationException() {
         testFilm.setDescription("This is a cartoon about small cute animals with which various adventures constantly" +
                 " happen, in which something goes wrong all the time. And no matter how innocently their day began -" +
                 "- at the end of it there will be a real mayhem. Traveling through their picturesque world and talking" +
@@ -48,28 +48,28 @@ class FilmControllerTest {
     }
 
     @Test
-    public void DurationLessThan0Test_ThrowsValidationException() {
+    public void testDurationLessThan0_ThrowsValidationException() {
         testFilm.setDuration(-1);
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect duration", exception.getMessage());
     }
 
     @Test
-    public void IncorrectReleaseDateTest_ThrowsValidationException() {
+    public void testIncorrectReleaseDate_ThrowsValidationException() {
         testFilm.setReleaseDate(LocalDate.of(1895, 12, 27));
         ValidationException exception = assertThrows(ValidationException.class, () -> test.createFilm(testFilm, request));
         assertEquals("Incorrect release date", exception.getMessage());
     }
 
     @Test
-    public void IncorrectIdTest_ThrowsValidationException() {
+    public void testIncorrectId_ThrowsValidationException() {
         testFilm.setId(-1);
         ValidationException exception = assertThrows(ValidationException.class, () -> test.updateFilm(testFilm, request));
         assertEquals("Incorrect id", exception.getMessage());
     }
 
     @Test
-    public void GetFilmsTest_ReturnsAllFilms() {
+    public void testGetFilms_ReturnsAllFilms() {
         Film testFilm2 = new Film(
                 1,
                 "Simpsons",
