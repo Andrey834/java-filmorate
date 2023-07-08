@@ -14,7 +14,7 @@ import java.util.*;
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    private InMemoryUserStorage userStorage;
+    private final InMemoryUserStorage userStorage;
 
     @Autowired
     public UserController(InMemoryUserStorage userStorage) {
