@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -15,8 +17,13 @@ import java.util.Map;
 
 class UserControllerTest {
     private User testUser;
-    UserController test = new UserController();
+    private final InMemoryUserStorage test;
     MockHttpServletRequest request = new MockHttpServletRequest();
+
+    @Autowired
+    public UserControllerTest(InMemoryUserStorage userStorage) {
+        this.test = userStorage;
+    }
 
     @BeforeEach
     public void createUser() {
