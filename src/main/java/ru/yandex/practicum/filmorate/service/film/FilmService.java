@@ -1,7 +1,14 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Film;
 
-@Service
-public class FilmService {
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+public interface FilmService {
+    Film createFilm(Film film, HttpServletRequest request);
+
+    Film updateFilm(Film film, HttpServletRequest request);
+
+    List<Film> getFilms();
 }

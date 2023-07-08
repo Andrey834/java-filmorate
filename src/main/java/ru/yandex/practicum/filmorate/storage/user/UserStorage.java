@@ -2,12 +2,13 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface UserStorage {
-    User createUser(User user);
+    User createUser(User user, HttpServletRequest request);
 
-    User updateUser(User user);
+    User updateUser(User user, HttpServletRequest request);
 
     List<User> getUsers();
 }
