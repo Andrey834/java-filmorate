@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
+import java.util.Collections;
 
 @Component
 @Slf4j
@@ -38,6 +40,28 @@ public class InMemoryFilmStorage implements FilmStorage {
         return new ArrayList<>(films.values());
     }
 
+    @Override
+    public void plusLike(int filmId, int userId) {
+        Film film = films.get(filmId);
+        film.getLikes().add((long) userId);
+    }
+
+    @Override
+    public void minusLike(int filmId, int userId) {
+        Film film = films.get(filmId);
+        film.getLikes().remove((long) userId);
+    }
+
+    // или лучше задать count константой? По ТЗ ведь 10 штук надо. Или какой-то еще вариант есть?
+    @Override
+    public List<Film> getMostPopularFilms(int count) { //сделать проверку чтоб count <= film.getLikes().size())
+        List<Film> mostPopularFilms = new ArrayList<>(films.values());
+        mostPopularFilms.sort(Comparator.comparingInt(film -> film.getLikes().size()));
+        Collections.reverse(mostPopularFilms);
+
+        return mostPopularFilms.subList(0, count);
+    }
+
     private void update(Film film) {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
@@ -46,4 +70,5 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("Incorrect id");
         }
     }
+
 }

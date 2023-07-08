@@ -11,4 +11,10 @@ public interface FilmService {
     Film updateFilm(Film film, HttpServletRequest request);
 
     List<Film> getFilms();
+
+    void plusLike(int userId, int filmId);
+
+    void minusLike(int userId, int filmId);
+
+    List<Film> getMostPopularFilms(int count);
 }
