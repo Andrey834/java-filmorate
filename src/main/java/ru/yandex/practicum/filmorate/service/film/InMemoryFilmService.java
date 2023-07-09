@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -22,7 +23,10 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film createFilm(Film film, HttpServletRequest request) {
-        if (film == null) throw new ValidationException("Film is null");
+        if (film == null) {
+            log.error("NotFoundException: Film not found.");
+            throw new NotFoundException("404. Film not found.");
+        }
         validation(film);
         film.setId(getNextId());
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
@@ -33,7 +37,7 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film updateFilm(Film film, HttpServletRequest request) {
-        if (film == null) throw new ValidationException("Film is null");
+        if (film == null) throw new NotFoundException("404. Film not found.");
         validation(film);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
@@ -44,6 +48,41 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public List<Film> getFilms() {
         return filmStorage.getFilms();
+    }
+
+    @Override
+    public void plusLike(int userId, int filmId) {
+        var user = userStorage
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
+        var film = filmStorage.getFilmById(filmId);
+        if (film == null) {
+            log.error("NotFoundException: Film not found.");
+            throw new NotFoundException("404. Film not found.");
+        }
+        filmStorage.plusLike(userId, filmId);
+    }
+
+    @Override
+    public void minusLike(int userId, int filmId) {
+        var user = userStorage
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
+        var film = filmStorage.getFilmById(filmId);
+        if (film == null) {
+            log.error("NotFoundException: Film not found.");
+            throw new NotFoundException("404. Film not found.");
+        }
+        filmStorage.minusLike(userId, filmId);
+    }
+
+    @Override
+    public List<Film> getMostPopularFilms(int count) {
+        return filmStorage.getMostPopularFilms(count);
     }
 
     private int getNextId() {

@@ -41,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void plusLike(int filmId, int userId) {
+    public void plusLike(int userId, int filmId) {
         Film film = films.get(filmId);
         film.getLikes().add((long) userId);
     }
@@ -60,6 +60,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         Collections.reverse(mostPopularFilms);
 
         return mostPopularFilms.subList(0, count);
+    }
+
+    @Override
+    public Film getFilmById(int filmId){
+        return films.get(filmId);
     }
 
     private void update(Film film) {
