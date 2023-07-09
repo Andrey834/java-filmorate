@@ -42,19 +42,19 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void plusLike(int userId, int filmId) {
-        Film film = films.get(filmId);
+        Film film = getFilmById(filmId);
         film.getLikes().add((long) userId);
     }
 
     @Override
     public void minusLike(int filmId, int userId) {
-        Film film = films.get(filmId);
+        Film film = getFilmById(filmId);
         film.getLikes().remove((long) userId);
     }
 
     // или лучше задать count константой? По ТЗ ведь 10 штук надо. Или какой-то еще вариант есть?
     @Override
-    public List<Film> getMostPopularFilms(int count) { //сделать проверку чтоб count <= film.getLikes().size())
+    public List<Film> getMostPopularFilms(int count) {
         List<Film> mostPopularFilms = new ArrayList<>(films.values());
         mostPopularFilms.sort(Comparator.comparingInt(film -> film.getLikes().size()));
         Collections.reverse(mostPopularFilms);

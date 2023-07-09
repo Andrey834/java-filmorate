@@ -52,7 +52,7 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public void plusLike(int userId, int filmId) {
-        var user = userStorage
+        var user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
             throw new NotFoundException("404. User not found.");
@@ -67,7 +67,7 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public void minusLike(int userId, int filmId) {
-        var user = userStorage
+        var user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
             throw new NotFoundException("404. User not found.");
@@ -81,8 +81,16 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getMostPopularFilms(int count) {
+    public List<Film> getMostPopularFilms(int count) { //или константа = 10 ?
+        if (count > filmStorage.getFilms().size()) {
+            count = filmStorage.getFilms().size();
+        }
         return filmStorage.getMostPopularFilms(count);
+    }
+
+    @Override
+    public Film getFilmById(int filmId){
+        return filmStorage.getFilmById(filmId);
     }
 
     private int getNextId() {

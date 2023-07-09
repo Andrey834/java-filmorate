@@ -1,47 +1,100 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class InMemoryUserService implements UserService {
     private int id;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserStorage userStorage;
 
     @Override
     public User createUser(User user, HttpServletRequest request) {
-        if (user == null) throw new ValidationException("User is null");
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
         validation(user);
         user.setId(getNextId());
-        users.put(user.getId(), user);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
-        return user;
+        return userStorage.createUser(user);
     }
 
     @Override
     public User updateUser(User user, HttpServletRequest request) {
-        if (user == null) throw new ValidationException("User is null");
-        update(user);
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
-        return user;
+        return userStorage.updateUser(user);
     }
 
     @Override
     public List<User> getUsers() {
-        return new ArrayList<>(users.values());
+        return userStorage.getUsers();
     }
+
+    @Override
+    public User getUserById(int userId){
+        return userStorage.getUserById(userId);
+    }
+
+    @Override
+    public void plusFriend(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
+        User friend = userStorage.getUserById(userId);
+        if (friend == null) {
+            log.error("NotFoundException: Friend not found.");
+            throw new NotFoundException("404. Friend not found.");
+        }
+        userStorage.plusFriend(userId, friendId);
+    }
+
+    @Override
+    public void minusFriend(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
+        User friend = userStorage.getUserById(userId);
+        if (friend == null) {
+            log.error("NotFoundException: Friend not found.");
+            throw new NotFoundException("404. Friend not found.");
+        }
+        userStorage.minusFriend(userId, friendId);
+    }
+
+    @Override
+    public List<User> getFriends(int userId){
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
+        return userStorage.getFriends(userId);
+    }
+
+    @Override
+    public List<User> getMutualFriends(int userId, int friendId){}
 
     private int getNextId() {
         return ++id;
@@ -66,16 +119,6 @@ public class InMemoryUserService implements UserService {
             throw new ValidationException("Date of birth cannot be in future");
         }
         if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
-    }
-
-    private void update(User user) {
-        if (users.containsKey(user.getId())) {
-            validation(user);
-            users.put(user.getId(), user);
-        } else {
-            log.error("ValidationException: incorrect id");
-            throw new ValidationException("Incorrect id");
-        }
     }
 
     private boolean isValidEmail(String email) {

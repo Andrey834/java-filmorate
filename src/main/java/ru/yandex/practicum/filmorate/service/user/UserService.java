@@ -11,4 +11,14 @@ public interface UserService {
     User updateUser(User user, HttpServletRequest request);
 
     List<User> getUsers();
+
+    void plusFriend(int userId, int friendId);
+
+    void minusFriend(int userId, int friendId);
+
+    List<User> getFriends(int userId);
+
+    List<User> getMutualFriends(int userId, int friendId);
+
+    User getUserById(int userId);
 }

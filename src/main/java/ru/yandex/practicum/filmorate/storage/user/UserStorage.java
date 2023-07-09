@@ -6,9 +6,19 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface UserStorage {
-    User createUser(User user, HttpServletRequest request);
+    User createUser(User user);
 
-    User updateUser(User user, HttpServletRequest request);
+    User updateUser(User user);
 
     List<User> getUsers();
+
+    void plusFriend(int userId, int friendId);
+
+    void minusFriend(int userId, int friendId);
+
+    User getUserById(int userId);
+
+    List<User> getFriends(int userId);
+
+    List<User> getMutualFriends(int userId, int friendId);
 }
