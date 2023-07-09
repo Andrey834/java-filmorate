@@ -9,6 +9,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +19,7 @@ import java.time.LocalDate;
 @Builder
 @EqualsAndHashCode(exclude = { "id"})
 public class Film {
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Name cannot be null")
     @NotEmpty(message = "Name cannot be empty")
@@ -31,4 +33,5 @@ public class Film {
 
     @Positive
     private int duration;
-}
+
+    private Set<Long> likes = new HashSet<>();}
