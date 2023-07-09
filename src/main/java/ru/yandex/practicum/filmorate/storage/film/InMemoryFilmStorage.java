@@ -52,7 +52,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.getLikes().remove((long) userId);
     }
 
-    // или лучше задать count константой? По ТЗ ведь 10 штук надо. Или какой-то еще вариант есть?
     @Override
     public List<Film> getMostPopularFilms(int count) {
         List<Film> mostPopularFilms = new ArrayList<>(films.values());
@@ -63,7 +62,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(int filmId){
+    public Film getFilmById(int filmId) {
         return films.get(filmId);
     }
 

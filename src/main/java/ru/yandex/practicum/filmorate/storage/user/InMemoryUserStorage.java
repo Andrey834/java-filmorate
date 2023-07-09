@@ -41,24 +41,24 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void plusFriend(int userId, int friendId){
+    public void plusFriend(int userId, int friendId) {
         User user = getUserById(userId);
         user.getFriends().add((long) friendId);
     }
 
     @Override
-    public void minusFriend(int userId, int friendId){
+    public void minusFriend(int userId, int friendId) {
         User user = getUserById(userId);
         user.getFriends().remove((long) friendId);
     }
 
     @Override
-    public User getUserById(int userId){
+    public User getUserById(int userId) {
         return users.get(userId);
     }
 
     @Override
-    public List<User> getFriends(int userId){
+    public List<User> getFriends(int userId) {
         User user = getUserById(userId);
         Set<Long> friends = user.getFriends();
 
@@ -70,7 +70,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getMutualFriends(int userId, int friendId){
+    public List<User> getMutualFriends(int userId, int friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
         Set<Long> friends = user.getFriends();

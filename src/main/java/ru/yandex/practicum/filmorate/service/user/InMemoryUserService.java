@@ -49,7 +49,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public User getUserById(int userId){
+    public User getUserById(int userId) {
         return userStorage.getUserById(userId);
     }
 
@@ -88,7 +88,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public List<User> getFriends(int userId, HttpServletRequest request){
+    public List<User> getFriends(int userId, HttpServletRequest request) {
         User user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
@@ -100,7 +100,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public List<User> getMutualFriends(int userId, int friendId, HttpServletRequest request){
+    public List<User> getMutualFriends(int userId, int friendId, HttpServletRequest request) {
         User user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
