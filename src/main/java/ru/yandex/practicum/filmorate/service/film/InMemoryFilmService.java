@@ -46,12 +46,15 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getFilms() {
+    public List<Film> getFilms(HttpServletRequest request) {
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return filmStorage.getFilms();
     }
 
     @Override
-    public void plusLike(int userId, int filmId) {
+    public void plusLike(int userId, int filmId, HttpServletRequest request) {
         var user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
@@ -62,11 +65,14 @@ public class InMemoryFilmService implements FilmService {
             log.error("NotFoundException: Film not found.");
             throw new NotFoundException("404. Film not found.");
         }
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         filmStorage.plusLike(userId, filmId);
     }
 
     @Override
-    public void minusLike(int userId, int filmId) {
+    public void minusLike(int userId, int filmId, HttpServletRequest request) {
         var user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
@@ -77,19 +83,31 @@ public class InMemoryFilmService implements FilmService {
             log.error("NotFoundException: Film not found.");
             throw new NotFoundException("404. Film not found.");
         }
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         filmStorage.minusLike(userId, filmId);
     }
 
     @Override
-    public List<Film> getMostPopularFilms(int count) { //или константа = 10 ?
+    public List<Film> getMostPopularFilms(int count, HttpServletRequest request) {
         if (count > filmStorage.getFilms().size()) {
+            log.info("Указанное пользователем значение count: '{}', значение превышает количество фильмов и будет" +
+                            " приравнено к максимальному значению: '{}'",
+                    count, filmStorage.getFilms().size());
             count = filmStorage.getFilms().size();
         }
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return filmStorage.getMostPopularFilms(count);
     }
 
     @Override
-    public Film getFilmById(int filmId){
+    public Film getFilmById(int filmId, HttpServletRequest request) {
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return filmStorage.getFilmById(filmId);
     }
 

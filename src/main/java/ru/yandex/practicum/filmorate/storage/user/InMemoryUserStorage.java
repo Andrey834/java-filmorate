@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -59,7 +60,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> getFriends(int userId){
         User user = getUserById(userId);
-        var friends = user.getFriends();
+        Set<Long> friends = user.getFriends();
 
         // пробовал при преобразовании прописать getUserById((int) friendId), не проходит. Как я понимаю это из-за отсутствия
         // вероятного проброса ошибки при переполнении? А в мат. функции проверка уже заложена, поэтому и пропускает, так ?
@@ -69,7 +70,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getMutualFriends(int userId, int friendId){}
+    public List<User> getMutualFriends(int userId, int friendId){
+        User user = getUserById(userId);
+        User friend = getUserById(friendId);
+        Set<Long> friends = user.getFriends();
+
+        return friends.stream()
+                .filter(id -> friend.getFriends().contains(id))
+                .map(friendsId -> getUserById(Math.toIntExact(friendsId)))
+                .collect(Collectors.toList());
+    }
 
     private void update(User user) {
         if (users.containsKey(user.getId())) {

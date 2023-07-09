@@ -10,13 +10,13 @@ public interface FilmService {
 
     Film updateFilm(Film film, HttpServletRequest request);
 
-    List<Film> getFilms();
+    List<Film> getFilms(HttpServletRequest request);
 
-    void plusLike(int userId, int filmId);
+    void plusLike(int userId, int filmId, HttpServletRequest request);
 
-    void minusLike(int userId, int filmId);
+    void minusLike(int userId, int filmId, HttpServletRequest request);
 
-    List<Film> getMostPopularFilms(int count);
+    List<Film> getMostPopularFilms(int count, HttpServletRequest request);
 
-    Film getFilmById(int filmId);
+    Film getFilmById(int filmId, HttpServletRequest request);
 }

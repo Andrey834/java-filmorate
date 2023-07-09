@@ -10,15 +10,15 @@ public interface UserService {
 
     User updateUser(User user, HttpServletRequest request);
 
-    List<User> getUsers();
+    List<User> getUsers(HttpServletRequest request);
 
-    void plusFriend(int userId, int friendId);
+    void plusFriend(int userId, int friendId, HttpServletRequest request);
 
-    void minusFriend(int userId, int friendId);
+    void minusFriend(int userId, int friendId, HttpServletRequest request);
 
-    List<User> getFriends(int userId);
+    List<User> getFriends(int userId, HttpServletRequest request);
 
-    List<User> getMutualFriends(int userId, int friendId);
+    List<User> getMutualFriends(int userId, int friendId, HttpServletRequest request);
 
     User getUserById(int userId);
 }
