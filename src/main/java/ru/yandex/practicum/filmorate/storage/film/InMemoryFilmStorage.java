@@ -47,7 +47,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void minusLike(int filmId, int userId) {
+    public void minusLike(int userId, int filmId) {
         Film film = getFilmById(filmId);
         film.getLikes().remove((long) userId);
     }
