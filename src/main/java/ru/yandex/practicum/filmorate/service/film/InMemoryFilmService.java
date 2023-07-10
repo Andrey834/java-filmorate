@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -58,12 +59,12 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public void plusLike(int userId, int filmId, HttpServletRequest request) {
-        var user = userStorage.getUserById(userId);
+        User user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
             throw new NotFoundException("404. User not found.");
         }
-        var film = filmStorage.getFilmById(filmId);
+        Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
             log.error("NotFoundException: Film not found.");
             throw new NotFoundException("404. Film not found.");
@@ -76,12 +77,12 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public void minusLike(int userId, int filmId, HttpServletRequest request) {
-        var user = userStorage.getUserById(userId);
+        User user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("NotFoundException: User not found.");
             throw new NotFoundException("404. User not found.");
         }
-        var film = filmStorage.getFilmById(filmId);
+        Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
             log.error("NotFoundException: Film not found.");
             throw new NotFoundException("404. Film not found.");
@@ -111,6 +112,11 @@ public class InMemoryFilmService implements FilmService {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
+        Film film = filmStorage.getFilmById(filmId);
+        if (film == null) {
+            log.error("NotFoundException: Film not found.");
+            throw new NotFoundException("404. Film not found.");
+        }
         return filmStorage.getFilmById(filmId);
     }
 

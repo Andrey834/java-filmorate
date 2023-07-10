@@ -43,7 +43,9 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void plusFriend(int userId, int friendId) {
         User user = getUserById(userId);
+        User friend = getUserById(friendId);
         user.getFriends().add((long) friendId);
+        friend.getFriends().add((long) userId);
         log.info("Пользователь: id='{}', имя = '{}' добавил в друзья пользователя: id='{}', имя = '{}'",
                 userId, user.getName(), friendId, getUserById(friendId).getName());
     }
@@ -56,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(int userId) {
-         return users.get(userId);
+        return users.get(userId);
     }
 
     @Override
