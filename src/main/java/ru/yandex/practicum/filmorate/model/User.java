@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(exclude = {"id"})
 public class User {
-    private Integer id;
+    private Long id;
 
     @Email(message = "Wrong format Email")
     @NotBlank(message = "Email cannot be empty")

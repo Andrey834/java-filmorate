@@ -7,42 +7,45 @@ import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    public final Map<Integer, User> usersRepo = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
     private Long id = 0L;
 
     @Override
     public User addUser(User user) {
-        final int idUser = Math.toIntExact(generateId());
+        final Long idUser = generateId();
         user.setId(idUser);
         if (user.getName().isEmpty()) user.setName(user.getLogin());
-        usersRepo.put(idUser, user);
+        users.put(idUser, user);
         return user;
     }
 
     @Override
-    public Optional<User> getUser(Long id) {
-        return Optional.ofNullable(usersRepo.get(Math.toIntExact(id)));
+    public User getUser(Long id) {
+        if (users.containsKey(id)) {
+            return users.get(id);
+        }
+        return null;
     }
 
     public Set<User> getUsers() {
-        return new HashSet<>(usersRepo.values());
+        return new HashSet<>(users.values());
     }
 
     @Override
-    public Optional<User> updateUser(User user) {
-        final Integer idUser = Math.toIntExact(user.getId());
-        if (usersRepo.containsKey(idUser)) {
-            usersRepo.put(idUser, user);
-            return Optional.of(usersRepo.get(idUser));
+    public User updateUser(User user) {
+        final Long idUser = user.getId();
+        if (users.containsKey(idUser)) {
+            users.put(idUser, user);
+            return users.get(idUser);
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
     public boolean removeUser(User user) {
-        final Integer idUser = Math.toIntExact(id);
-        if (usersRepo.containsKey(idUser)) {
-            usersRepo.remove(idUser);
+        final Long idUser = id;
+        if (users.containsKey(idUser)) {
+            users.remove(idUser);
             return true;
         }
         return false;

@@ -7,26 +7,25 @@ import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    public final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
     private Long id = 0L;
 
     @Override
     public Film addFilm(Film film) {
-        final int idFilm = Math.toIntExact(generateId());
-        film.setId((long) idFilm);
+        final Long idFilm = generateId();
+        film.setId(idFilm);
         films.put(idFilm, film);
-        return film;
-    }
-
-    @Override
-    public Film getFilm(Long id) {
-        Integer idFilm = Math.toIntExact(id);
         return films.get(idFilm);
     }
 
     @Override
+    public Film getFilm(Long id) {
+        return films.get(id);
+    }
+
+    @Override
     public boolean removeFilm(Film film) {
-        Integer idFilm = Math.toIntExact(film.getId());
+        final Long idFilm = film.getId();
         if (films.containsKey(idFilm)) {
             films.remove(idFilm);
             return true;
@@ -35,13 +34,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> updateFilm(Film film) {
-        Integer idFilm = Math.toIntExact(film.getId());
+    public Film updateFilm(Film film) {
+        final Long idFilm = film.getId();
         if (films.containsKey(idFilm)) {
             films.put(idFilm, film);
-            return Optional.of(films.get(idFilm));
+            return films.get(idFilm);
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override

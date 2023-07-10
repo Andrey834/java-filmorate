@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
@@ -12,11 +13,14 @@ import java.util.stream.Collectors;
 public class FilmService implements FilmStorage {
     private final FilmStorage filmStorage;
 
-    public FilmService(@Qualifier("inMemoryFilmStorage") FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
     public boolean doLike(Long filmId, Long userId) {
+        Optional<Film> film = Optional.ofNullable(filmStorage.getFilm(filmId));
+        if (film.isEmpty()) throw new FilmNotFoundException("Film not found = " + filmId);
+
         return filmStorage
                 .getFilm(filmId)
                 .getLikes()
@@ -24,6 +28,13 @@ public class FilmService implements FilmStorage {
     }
 
     public boolean removeLike(Long filmId, Long userId) {
+        Optional<Film> film = Optional.ofNullable(filmStorage.getFilm(filmId));
+        if (film.isEmpty()) throw new FilmNotFoundException("Film not found = " + filmId);
+
+        if (!film.get().getLikes().contains(userId)) {
+            throw new UserNotFoundException("User not found = " + userId);
+        }
+
         return filmStorage
                 .getFilm(filmId)
                 .getLikes()
@@ -41,12 +52,15 @@ public class FilmService implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
+        System.out.println(film);
         return filmStorage.addFilm(film);
     }
 
     @Override
     public Film getFilm(Long id) {
-        return filmStorage.getFilm(id);
+        Optional<Film> film = Optional.ofNullable(filmStorage.getFilm(id));
+        if (film.isEmpty()) throw new FilmNotFoundException("Film not found = " + id);
+        return film.get();
     }
 
     @Override
@@ -60,7 +74,9 @@ public class FilmService implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+    public Film updateFilm(Film film) {
+        Film updateFilm = filmStorage.updateFilm(film);
+        if (updateFilm == null) throw new FilmNotFoundException("Film not found = " + film.getId());
+        return updateFilm;
     }
 }

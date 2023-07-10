@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Optional;
 import java.util.Set;
 
 public interface FilmStorage {
@@ -14,5 +13,5 @@ public interface FilmStorage {
 
     boolean removeFilm(Film film);
 
-    Optional<Film> updateFilm(Film film);
+    Film updateFilm(Film film);
 }
