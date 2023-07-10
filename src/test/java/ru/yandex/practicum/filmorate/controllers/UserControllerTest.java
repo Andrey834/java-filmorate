@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ class UserControllerTest {
     @Autowired
     private UserController userController;
     @Autowired
-    MockHttpServletRequest request;
+    private MockHttpServletRequest request;
 
 
     @BeforeEach
