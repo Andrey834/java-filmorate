@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,10 +16,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
+
+@SpringBootTest
 class UserControllerTest {
     private User testUser;
+    @Autowired
     private UserController userController;
+    @Autowired
     MockHttpServletRequest request;
 
 
@@ -99,4 +104,5 @@ class UserControllerTest {
         Collection<User> result = userController.getUsers(request);
         assertTrue(result.containsAll(users.values()));
     }
+
 }

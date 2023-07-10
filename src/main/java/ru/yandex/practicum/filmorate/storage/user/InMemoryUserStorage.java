@@ -64,6 +64,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         // пробовал при преобразовании прописать getUserById((int) friendId), не проходит. Как я понимаю это из-за отсутствия
         // вероятного проброса ошибки при переполнении? А в мат. функции проверка уже заложена, поэтому и пропускает, так ?
+        // (int)friendId.longValue()) - пробовал такой вариант вместо Math.toIntExact(friendId)). Рабочий.
         return friends.stream()
                 .map(friendId -> getUserById(Math.toIntExact(friendId)))
                 .collect(Collectors.toList());

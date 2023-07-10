@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -17,12 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
+@SpringBootTest
 class FilmControllerTest {
     private Film testFilm;
     private User testuser;
-    private FilmController filmController;
+    @Autowired
+    FilmController filmController;
+    @Autowired
     private UserService userService;
+    @Autowired
     MockHttpServletRequest request;
 
 
@@ -114,6 +119,7 @@ class FilmControllerTest {
     @Test
     public void testPlusLike() {
         Film film = filmController.createFilm(testFilm, request);
+        User user = userService.createUser(testuser,request);
         filmController.plusLike(film.getId(), testuser.getId(), request);
 
         assertTrue(film.getLikes().contains((long) testuser.getId()));
@@ -123,6 +129,7 @@ class FilmControllerTest {
     @Test
     public void testMinusLike() {
         Film film = filmController.createFilm(testFilm, request);
+        User user = userService.createUser(testuser,request);
         filmController.plusLike(film.getId(), testuser.getId(), request);
         filmController.minusLike(film.getId(), testuser.getId(), request);
 
@@ -134,6 +141,7 @@ class FilmControllerTest {
         Film film1 = filmController.createFilm(testFilm, request);
         Film film2 = filmController.createFilm(testFilm, request);
         Film film3 = filmController.createFilm(testFilm, request);
+        User user = userService.createUser(testuser,request);
         filmController.plusLike(film2.getId(), testuser.getId(), request);
         List<Film> films = filmController.getMostPopularFilms(1,request);
 
