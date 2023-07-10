@@ -70,8 +70,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
         } else {
-            log.error("NotFoundException: incorrect id");
-            throw new NotFoundException("Incorrect id");
+            log.error("NotFoundException: Film not found.");
+            throw new NotFoundException("404. Film not found.");
         }
     }
 

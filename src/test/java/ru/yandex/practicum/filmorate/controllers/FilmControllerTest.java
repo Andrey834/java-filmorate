@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -82,8 +83,8 @@ class FilmControllerTest {
     @Test
     public void testIncorrectId_ThrowsValidationException() {
         testFilm.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> filmController.updateFilm(testFilm, request));
-        assertEquals("Incorrect id", exception.getMessage());
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> filmController.updateFilm(testFilm, request));
+        assertEquals("404. Film not found.", exception.getMessage());
     }
 
     @Test

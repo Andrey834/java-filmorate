@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -80,8 +81,8 @@ class UserControllerTest {
     @Test
     public void testIncorrectId_ThrowsValidationException() {
         testUser.setId(-1);
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.updateUser(testUser, request));
-        assertEquals("Incorrect id", exception.getMessage());
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> userController.updateUser(testUser, request));
+        assertEquals("404. User not found.", exception.getMessage());
     }
 
     @Test

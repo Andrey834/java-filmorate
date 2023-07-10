@@ -88,8 +88,8 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
         } else {
-            log.error("NotFoundException: incorrect id");
-            throw new NotFoundException("Incorrect id");
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
         }
     }
 }
