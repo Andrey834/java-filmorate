@@ -108,7 +108,7 @@ class FilmControllerTest {
 
     @Test
     public void default0LikesTest() {
-        Film film = filmController.createFilm(testFilm,request);
+        Film film = filmController.createFilm(testFilm, request);
 
         assertNotNull(film.getLikes());
         assertEquals(film.getLikes().size(), 0);
@@ -117,7 +117,7 @@ class FilmControllerTest {
     @Test
     public void testPlusLike() {
         Film film = filmController.createFilm(testFilm, request);
-        User user = userService.createUser(testuser,request);
+        User user = userService.createUser(testuser, request);
         filmController.plusLike(film.getId(), testuser.getId(), request);
 
         assertTrue(film.getLikes().contains((long) testuser.getId()));
@@ -127,7 +127,7 @@ class FilmControllerTest {
     @Test
     public void testMinusLike() {
         Film film = filmController.createFilm(testFilm, request);
-        User user = userService.createUser(testuser,request);
+        User user = userService.createUser(testuser, request);
         filmController.plusLike(film.getId(), testuser.getId(), request);
         filmController.minusLike(film.getId(), testuser.getId(), request);
 
@@ -135,13 +135,13 @@ class FilmControllerTest {
     }
 
     @Test
-    public void testGetMostPopularFilms(){
+    public void testGetMostPopularFilms() {
         Film film1 = filmController.createFilm(testFilm, request);
         Film film2 = filmController.createFilm(testFilm, request);
         Film film3 = filmController.createFilm(testFilm, request);
-        User user = userService.createUser(testuser,request);
+        User user = userService.createUser(testuser, request);
         filmController.plusLike(film2.getId(), testuser.getId(), request);
-        List<Film> films = filmController.getMostPopularFilms(1,request);
+        List<Film> films = filmController.getMostPopularFilms(1, request);
 
         assertEquals(1, films.size());
     }
