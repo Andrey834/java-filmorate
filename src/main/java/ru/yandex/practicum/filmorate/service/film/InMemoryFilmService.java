@@ -37,7 +37,10 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film updateFilm(Film film, HttpServletRequest request) {
-        if (film == null) throw new NotFoundException("404. Film not found.");
+        if (film == null) {
+            log.error("NotFoundException: Film not found.");
+            throw new NotFoundException("404. Film not found.");
+        }
         validation(film);
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());

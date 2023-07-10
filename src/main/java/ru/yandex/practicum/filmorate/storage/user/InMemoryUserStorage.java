@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -44,6 +45,8 @@ public class InMemoryUserStorage implements UserStorage {
     public void plusFriend(int userId, int friendId) {
         User user = getUserById(userId);
         user.getFriends().add((long) friendId);
+        log.info("Пользователь: id='{}', имя = '{}' добавил в друзья пользователя: id='{}', имя = '{}'",
+                userId, user.getName(), friendId, getUserById(friendId).getName());
     }
 
     @Override
@@ -54,7 +57,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(int userId) {
-        return users.get(userId);
+         return users.get(userId);
     }
 
     @Override
@@ -64,7 +67,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         // пробовал при преобразовании прописать getUserById((int) friendId), не проходит. Как я понимаю это из-за отсутствия
         // вероятного проброса ошибки при переполнении? А в мат. функции проверка уже заложена, поэтому и пропускает, так ?
-        // (int)friendId.longValue()) - пробовал такой вариант вместо Math.toIntExact(friendId)). Рабочий.
+        // (int)friendId.longValue()) - пробовал такой вариант вместо Math.toIntExact(friendId)). Рабочий, но выглядит страшно :)
         return friends.stream()
                 .map(friendId -> getUserById(Math.toIntExact(friendId)))
                 .collect(Collectors.toList());
@@ -86,8 +89,8 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
         } else {
-            log.error("ValidationException: incorrect id");
-            throw new ValidationException("Incorrect id");
+            log.error("NotFoundException: incorrect id");
+            throw new NotFoundException("Incorrect id");
         }
     }
 }

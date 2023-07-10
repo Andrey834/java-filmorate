@@ -128,8 +128,8 @@ class FilmControllerTest {
     public void testMinusLike() {
         Film film = filmController.createFilm(testFilm, request);
         User user = userService.createUser(testuser, request);
-        filmController.plusLike(film.getId(), testuser.getId(), request);
-        filmController.minusLike(film.getId(), testuser.getId(), request);
+        filmController.plusLike(film.getId(), user.getId(), request);
+        filmController.minusLike(film.getId(), user.getId(), request);
 
         assertEquals(film.getLikes().size(), 0);
     }

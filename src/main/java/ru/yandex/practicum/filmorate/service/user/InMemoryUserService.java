@@ -50,6 +50,11 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public User getUserById(int userId) {
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            log.error("NotFoundException: User not found.");
+            throw new NotFoundException("404. User not found.");
+        }
         return userStorage.getUserById(userId);
     }
 
@@ -60,7 +65,7 @@ public class InMemoryUserService implements UserService {
             log.error("NotFoundException: User not found.");
             throw new NotFoundException("404. User not found.");
         }
-        User friend = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
         if (friend == null) {
             log.error("NotFoundException: Friend not found.");
             throw new NotFoundException("404. Friend not found.");
