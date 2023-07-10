@@ -39,7 +39,6 @@ class FilmControllerTest {
                 LocalDate.of(1999, 12, 24),
                 5
         );
-
         testuser = new User(
                 1,
                 "JavaProgrammer2000@yandex.ru",
