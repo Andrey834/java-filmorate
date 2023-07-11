@@ -1,33 +1,58 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmsService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/films")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class FilmsController {
-    private FilmsService films;
+    private final FilmService filmService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@Valid @RequestBody Film film) {
-        return films.addFilm(film);
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return films.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 
     @GetMapping
-    public List<Film> getFilms() {
-        return films.getFilms();
+    @ResponseStatus(HttpStatus.OK)
+    public Set<Film> getFilms() {
+        return filmService.getFilms();
+    }
+
+    @GetMapping(value = "/{id}")
+    public Film getFilm(@PathVariable Long id) {
+        return filmService.getFilm(id);
+    }
+
+    @PutMapping(value = "/{filmId}/like/{userId}")
+    public boolean likeFilm(@PathVariable Long filmId, @PathVariable Long userId) {
+        return filmService.doLike(filmId, userId);
+    }
+
+    @DeleteMapping(value = "/{filmId}/like/{userId}")
+    public boolean deleteLikeFilm(@PathVariable Long filmId, @PathVariable Long userId) {
+        return filmService.removeLike(filmId, userId);
+    }
+
+    @GetMapping(value = "/popular")
+    public List<Film> deleteLikeFilm(
+            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
+        return filmService.getTopRate(count);
     }
 }

@@ -6,17 +6,19 @@ import ru.yandex.practicum.filmorate.validator.LoginValidator;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
 @Builder
-@EqualsAndHashCode(exclude = {"id", "name", "birthday"})
+@EqualsAndHashCode(exclude = {"id"})
 public class User {
-    private Integer id;
+    private Long id;
 
     @Email(message = "Wrong format Email")
     @NotBlank(message = "Email cannot be empty")
@@ -28,13 +30,9 @@ public class User {
 
     private String name;
 
-    @Past
+    @PastOrPresent
     private LocalDate birthday;
 
-    public void checkName() {
-        if (this.name == null || this.name.isBlank()) {
-            this.name = this.login;
-        }
-    }
+    private Set<Long> friends = new HashSet<>();
 }
 
