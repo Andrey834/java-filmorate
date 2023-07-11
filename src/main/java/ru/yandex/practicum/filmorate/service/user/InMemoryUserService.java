@@ -111,7 +111,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public void deleteAllUsers(){
+    public void deleteAllUsers() {
         userStorage.deleteAllUsers();
         setId(0);
         log.info("User database was clear");
