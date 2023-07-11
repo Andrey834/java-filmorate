@@ -17,6 +17,8 @@ public interface UserStorage {
 
     User getUserById(int userId);
 
+    boolean existsById(int userId);
+
     List<User> getFriends(int userId);
 
     List<User> getMutualFriends(int userId, int friendId);

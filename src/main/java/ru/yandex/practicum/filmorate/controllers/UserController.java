@@ -19,41 +19,65 @@ public class UserController {
 
     @PostMapping()
     public User createUser(@Valid @RequestBody User user, HttpServletRequest request) {
-        return userService.createUser(user, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return userService.createUser(user);
     }
 
     @PutMapping()
     public User updateUser(@Valid @RequestBody User user, HttpServletRequest request) {
-        return userService.updateUser(user, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return userService.updateUser(user);
     }
 
     @GetMapping()
     public List<User> getUsers(HttpServletRequest request) {
-        return userService.getUsers(request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return userService.getUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) {
+    public User getUserById(@PathVariable int id, HttpServletRequest request) {
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return userService.getUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void plusFriend(@PathVariable int id, @PathVariable int friendId, HttpServletRequest request) {
-        userService.plusFriend(id, friendId, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void minusFriend(@PathVariable int id, @PathVariable int friendId, HttpServletRequest request) {
-        userService.minusFriend(id, friendId, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable int id, HttpServletRequest request) {
-        return userService.getFriends(id, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getMutualFriends(@PathVariable int id, @PathVariable int otherId, HttpServletRequest request) {
-        return userService.getMutualFriends(id, otherId, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return userService.getMutualFriends(id, otherId);
     }
 }

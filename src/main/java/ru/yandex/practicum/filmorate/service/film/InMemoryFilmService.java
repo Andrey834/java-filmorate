@@ -3,14 +3,13 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.EmptyObjectException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,99 +22,82 @@ public class InMemoryFilmService implements FilmService {
     private final UserStorage userStorage;
 
     @Override
-    public Film createFilm(Film film, HttpServletRequest request) {
+    public Film createFilm(Film film) {
         if (film == null) {
-            log.error("NotFoundException: Film not found.");
-            throw new NotFoundException("404. Film not found.");
+            log.error("EmptyObjectException: Film is null.");
+            throw new EmptyObjectException("Film was not provided.");
         }
         validation(film);
         film.setId(getNextId());
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
 
         return filmStorage.createFilm(film);
     }
 
     @Override
-    public Film updateFilm(Film film, HttpServletRequest request) {
+    public Film updateFilm(Film film) {
         if (film == null) {
-            log.error("NotFoundException: Film not found.");
-            throw new NotFoundException("404. Film not found.");
+            log.error("EmptyObjectException: Film is null.");
+            throw new EmptyObjectException("Film was not provided.");
+        }
+        if (!filmStorage.existsById(film.getId())) { // не очень нравится что объект film будет еще раз создан в методе
+            log.error("NotFoundException: Film with id={} was not found.", film.getId());
+            throw new NotFoundException("Film not found.");
         }
         validation(film);
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
 
         return filmStorage.updateFilm(film);
     }
 
     @Override
-    public List<Film> getFilms(HttpServletRequest request) {
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
-
+    public List<Film> getFilms() {
         return filmStorage.getFilms();
     }
 
     @Override
-    public void plusLike(int userId, int filmId, HttpServletRequest request) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+    public void addLike(int userId, int filmId) {
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
-        Film film = filmStorage.getFilmById(filmId);
-        if (film == null) {
-            log.error("NotFoundException: Film not found.");
-            throw new NotFoundException("404. Film not found.");
+        if (!filmStorage.existsById(filmId)) {
+            log.error("NotFoundException: Film with id={} was not found.", filmId);
+            throw new NotFoundException("Film not found.");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
 
         filmStorage.plusLike(userId, filmId);
     }
 
     @Override
-    public void minusLike(int userId, int filmId, HttpServletRequest request) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+    public void removeLike(int userId, int filmId) {
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
-        Film film = filmStorage.getFilmById(filmId);
-        if (film == null) {
-            log.error("NotFoundException: Film not found.");
-            throw new NotFoundException("404. Film not found.");
+        if (!filmStorage.existsById(filmId)) {
+            log.error("NotFoundException: Film with id={} was not found.", filmId);
+            throw new NotFoundException("Film not found.");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
 
         filmStorage.minusLike(userId, filmId);
     }
 
     @Override
-    public List<Film> getMostPopularFilms(int count, HttpServletRequest request) {
+    public List<Film> getMostPopularFilms(int count) {
         if (count > filmStorage.getFilms().size()) {
-            log.info("Указанное пользователем значение count: '{}', значение превышает количество фильмов и будет" +
+            log.warn("Указанное пользователем значение count: '{}', значение превышает количество фильмов и будет" +
                             " приравнено к максимальному значению: '{}'",
                     count, filmStorage.getFilms().size());
             count = filmStorage.getFilms().size();
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
 
         return filmStorage.getMostPopularFilms(count);
     }
 
     @Override
-    public Film getFilmById(int filmId, HttpServletRequest request) {
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
-
-        Film film = filmStorage.getFilmById(filmId);
-        if (film == null) {
-            log.error("NotFoundException: Film not found.");
-            throw new NotFoundException("404. Film not found.");
+    public Film getFilmById(int filmId) {
+        if (!filmStorage.existsById(filmId)) {
+            log.error("NotFoundException: Film with id={} was not found.", filmId);
+            throw new NotFoundException("Film not found.");
         }
         return filmStorage.getFilmById(filmId);
     }
@@ -142,5 +124,4 @@ public class InMemoryFilmService implements FilmService {
             throw new ValidationException("Incorrect release date");
         }
     }
-
 }

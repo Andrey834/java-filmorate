@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.service.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.EmptyObjectException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,104 +20,90 @@ public class InMemoryUserService implements UserService {
     private final UserStorage userStorage;
 
     @Override
-    public User createUser(User user, HttpServletRequest request) {
+    public User createUser(User user) {
         if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+            log.error("EmptyObjectException: User is null.");
+            throw new EmptyObjectException("User was not provided");
         }
         validation(user);
         user.setId(getNextId());
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return userStorage.createUser(user);
     }
 
     @Override
-    public User updateUser(User user, HttpServletRequest request) {
+    public User updateUser(User user) {
         if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+            log.error("EmptyObjectException: User is null.");
+            throw new EmptyObjectException("User was not provided");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return userStorage.updateUser(user);
     }
 
     @Override
-    public List<User> getUsers(HttpServletRequest request) {
+    public List<User> getUsers() {
         return userStorage.getUsers();
     }
 
     @Override
     public User getUserById(int userId) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
         return userStorage.getUserById(userId);
     }
 
     @Override
-    public void plusFriend(int userId, int friendId, HttpServletRequest request) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+    public void addFriend(int userId, int friendId) {
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
-        User friend = userStorage.getUserById(friendId);
-        if (friend == null) {
-            log.error("NotFoundException: Friend not found.");
-            throw new NotFoundException("404. Friend not found.");
+        if (!userStorage.existsById(friendId)) {
+            log.error("NotFoundException: Friend with id={} was not found.", friendId);
+            throw new NotFoundException("Friend not found.");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         userStorage.plusFriend(userId, friendId);
     }
 
     @Override
-    public void minusFriend(int userId, int friendId, HttpServletRequest request) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+    public void removeFriend(int userId, int friendId) {
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
-        User friend = userStorage.getUserById(userId);
-        if (friend == null) {
-            log.error("NotFoundException: Friend not found.");
-            throw new NotFoundException("404. Friend not found.");
+        if (!userStorage.existsById(friendId)) {
+            log.error("NotFoundException: Friend with id={} was not found.", friendId);
+            throw new NotFoundException("Friend not found.");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         userStorage.minusFriend(userId, friendId);
     }
 
     @Override
-    public List<User> getFriends(int userId, HttpServletRequest request) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+    public List<User> getFriends(int userId) {
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return userStorage.getFriends(userId);
     }
 
     @Override
-    public List<User> getMutualFriends(int userId, int friendId, HttpServletRequest request) {
-        User user = userStorage.getUserById(userId);
-        if (user == null) {
-            log.error("NotFoundException: User not found.");
-            throw new NotFoundException("404. User not found.");
+    public List<User> getMutualFriends(int userId, int friendId) {
+        if (!userStorage.existsById(userId)) {
+            log.error("NotFoundException: User with id={} was not found.", userId);
+            throw new NotFoundException("User not found.");
         }
-        User friend = userStorage.getUserById(userId);
-        if (friend == null) {
-            log.error("NotFoundException: Friend not found.");
-            throw new NotFoundException("404. Friend not found.");
+        if (!userStorage.existsById(friendId)) {
+            log.error("NotFoundException: Friend with id={} was not found.", friendId);
+            throw new NotFoundException("Friend not found.");
         }
-        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
         return userStorage.getMutualFriends(userId, friendId);
     }
 

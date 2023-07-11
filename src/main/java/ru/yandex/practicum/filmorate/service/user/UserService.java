@@ -2,23 +2,22 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface UserService {
-    User createUser(User user, HttpServletRequest request);
+    User createUser(User user);
 
-    User updateUser(User user, HttpServletRequest request);
+    User updateUser(User user);
 
-    List<User> getUsers(HttpServletRequest request);
+    List<User> getUsers();
 
-    void plusFriend(int userId, int friendId, HttpServletRequest request);
+    void addFriend(int userId, int friendId);
 
-    void minusFriend(int userId, int friendId, HttpServletRequest request);
+    void removeFriend(int userId, int friendId);
 
-    List<User> getFriends(int userId, HttpServletRequest request);
+    List<User> getFriends(int userId);
 
-    List<User> getMutualFriends(int userId, int friendId, HttpServletRequest request);
+    List<User> getMutualFriends(int userId, int friendId);
 
     User getUserById(int userId);
 }

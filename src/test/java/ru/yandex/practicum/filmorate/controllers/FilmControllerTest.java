@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -26,7 +25,7 @@ class FilmControllerTest {
     @Autowired
     private FilmController filmController;
     @Autowired
-    private UserService userService;
+    private UserController userController;
     @Autowired
     private MockHttpServletRequest request;
 
@@ -118,17 +117,17 @@ class FilmControllerTest {
     @Test
     public void testPlusLike() {
         Film film = filmController.createFilm(testFilm, request);
-        User user = userService.createUser(testuser, request);
+        User user = userController.createUser(testuser, request);
         filmController.plusLike(film.getId(), testuser.getId(), request);
 
-        assertTrue(film.getLikes().contains((long) testuser.getId()));
+        assertTrue(film.getLikes().contains(testuser.getId()));
         assertEquals(film.getLikes().size(), 1);
     }
 
     @Test
     public void testMinusLike() {
         Film film = filmController.createFilm(testFilm, request);
-        User user = userService.createUser(testuser, request);
+        User user = userController.createUser(testuser, request);
         filmController.plusLike(film.getId(), user.getId(), request);
         filmController.minusLike(film.getId(), user.getId(), request);
 
@@ -140,10 +139,19 @@ class FilmControllerTest {
         Film film1 = filmController.createFilm(testFilm, request);
         Film film2 = filmController.createFilm(testFilm, request);
         Film film3 = filmController.createFilm(testFilm, request);
-        User user = userService.createUser(testuser, request);
+        User user = userController.createUser(testuser, request);
         filmController.plusLike(film2.getId(), testuser.getId(), request);
         List<Film> films = filmController.getMostPopularFilms(1, request);
 
         assertEquals(1, films.size());
+    }
+
+    @Test
+    public void testGetFilmById() {
+        Film film1 = filmController.createFilm(testFilm, request);
+        Film film2 = filmController.createFilm(testFilm, request);
+        filmController.getFilmById(film2.getId(), request);
+
+        assertEquals(2, film2.getId());
     }
 }

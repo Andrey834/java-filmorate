@@ -18,36 +18,57 @@ public class FilmController {
 
     @PostMapping()
     public Film createFilm(@RequestBody Film film, HttpServletRequest request) {
-        return filmService.createFilm(film, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return filmService.createFilm(film);
     }
 
     @PutMapping()
     public Film updateFilm(@RequestBody Film film, HttpServletRequest request) {
-        return filmService.updateFilm(film, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return filmService.updateFilm(film);
     }
 
     @GetMapping()
     public List<Film> getFilms(HttpServletRequest request) {
-        return filmService.getFilms(request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return filmService.getFilms();
     }
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable int id, HttpServletRequest request) {
-        return filmService.getFilmById(id, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return filmService.getFilmById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void plusLike(@PathVariable int id, @PathVariable int userId, HttpServletRequest request) {
-        filmService.plusLike(userId, id, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        filmService.addLike(userId, id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void minusLike(@PathVariable int id, @PathVariable int userId, HttpServletRequest request) {
-        filmService.minusLike(userId, id, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        filmService.removeLike(userId, id);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/popular?count={count}")
     public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count, HttpServletRequest request) {
-        return filmService.getMostPopularFilms(count, request);
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return filmService.getMostPopularFilms(count);
     }
 }

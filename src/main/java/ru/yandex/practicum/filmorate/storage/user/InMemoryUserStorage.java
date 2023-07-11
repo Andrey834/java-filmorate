@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ public class InMemoryUserStorage implements UserStorage {
     public void plusFriend(int userId, int friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-        user.getFriends().add((long) friendId);
-        friend.getFriends().add((long) userId);
+        user.getFriends().add(friendId);
+        friend.getFriends().add(userId);
         log.info("Пользователь: id='{}', имя = '{}' добавил в друзья пользователя: id='{}', имя = '{}'",
                 userId, user.getName(), friendId, getUserById(friendId).getName());
     }
@@ -53,7 +53,9 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void minusFriend(int userId, int friendId) {
         User user = getUserById(userId);
-        user.getFriends().remove((long) friendId);
+        User friend = getUserById(friendId);
+        user.getFriends().remove(friendId);
+        friend.getFriends().remove(userId);
     }
 
     @Override
@@ -64,13 +66,10 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> getFriends(int userId) {
         User user = getUserById(userId);
-        Set<Long> friends = user.getFriends();
+        Set<Integer> friends = user.getFriends();
 
-        // пробовал при преобразовании прописать getUserById((int) friendId), не проходит. Как я понимаю это из-за отсутствия
-        // вероятного проброса ошибки при переполнении? А в мат. функции проверка уже заложена, поэтому и пропускает, так ?
-        // (int)friendId.longValue()) - пробовал такой вариант вместо Math.toIntExact(friendId)). Рабочий, но выглядит страшно :)
         return friends.stream()
-                .map(friendId -> getUserById(Math.toIntExact(friendId)))
+                .map(this::getUserById)
                 .collect(Collectors.toList());
     }
 
@@ -78,12 +77,18 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getMutualFriends(int userId, int friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-        Set<Long> friends = user.getFriends();
+        Set<Integer> otherFriends = user.getFriends();
 
-        return friends.stream()
+        return otherFriends.stream()
                 .filter(id -> friend.getFriends().contains(id))
-                .map(friendsId -> getUserById(Math.toIntExact(friendsId)))
+                .map(this::getUserById)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsById(int userId) {
+        User user = getUserById(userId);
+        return user != null;
     }
 
     private void update(User user) {
