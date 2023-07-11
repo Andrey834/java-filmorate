@@ -41,7 +41,7 @@ public class InMemoryFilmService implements FilmService {
         }
         if (!filmStorage.existsById(film.getId())) { // не очень нравится что объект film будет еще раз создан в методе
             log.error("NotFoundException: Film with id={} was not found.", film.getId());
-            throw new NotFoundException("Film not found.");
+            throw new NotFoundException("Film was not found.");
         }
         validation(film);
 
@@ -57,11 +57,11 @@ public class InMemoryFilmService implements FilmService {
     public void addLike(int userId, int filmId) {
         if (!userStorage.existsById(userId)) {
             log.error("NotFoundException: User with id={} was not found.", userId);
-            throw new NotFoundException("User not found.");
+            throw new NotFoundException("User was not found.");
         }
         if (!filmStorage.existsById(filmId)) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
-            throw new NotFoundException("Film not found.");
+            throw new NotFoundException("Film was not found.");
         }
 
         filmStorage.plusLike(userId, filmId);
@@ -71,11 +71,11 @@ public class InMemoryFilmService implements FilmService {
     public void removeLike(int userId, int filmId) {
         if (!userStorage.existsById(userId)) {
             log.error("NotFoundException: User with id={} was not found.", userId);
-            throw new NotFoundException("User not found.");
+            throw new NotFoundException("User was not found.");
         }
         if (!filmStorage.existsById(filmId)) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
-            throw new NotFoundException("Film not found.");
+            throw new NotFoundException("Film was not found.");
         }
 
         filmStorage.minusLike(userId, filmId);
@@ -97,13 +97,24 @@ public class InMemoryFilmService implements FilmService {
     public Film getFilmById(int filmId) {
         if (!filmStorage.existsById(filmId)) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
-            throw new NotFoundException("Film not found.");
+            throw new NotFoundException("Film was not found.");
         }
         return filmStorage.getFilmById(filmId);
     }
 
+    @Override
+    public void deleteAllFilms() {
+        filmStorage.deleteAllFilms();
+        setId(0);
+        log.info("Film database was clear");
+    }
+
     private int getNextId() {
         return ++id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     private void validation(Film film) {

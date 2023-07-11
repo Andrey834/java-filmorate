@@ -20,4 +20,6 @@ public interface FilmStorage {
     Film getFilmById(int filmId);
 
     boolean existsById(int filmId);
+
+    void deleteAllFilms();
 }

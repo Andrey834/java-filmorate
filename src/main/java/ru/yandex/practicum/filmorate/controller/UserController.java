@@ -1,74 +1,83 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.*;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/films")
-public class FilmController {
-    private final FilmService filmService;
+@RequestMapping("/users")
+public class UserController {
+    private final UserService userService;
 
     @PostMapping()
-    public Film createFilm(@RequestBody Film film, HttpServletRequest request) {
+    public User createUser(@Valid @RequestBody User user, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return filmService.createFilm(film);
+        return userService.createUser(user);
     }
 
     @PutMapping()
-    public Film updateFilm(@RequestBody Film film, HttpServletRequest request) {
+    public User updateUser(@Valid @RequestBody User user, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return filmService.updateFilm(film);
+        return userService.updateUser(user);
     }
 
     @GetMapping()
-    public List<Film> getFilms(HttpServletRequest request) {
+    public List<User> getUsers(HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return filmService.getFilms();
+        return userService.getUsers();
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable int id, HttpServletRequest request) {
+    public User getUserById(@PathVariable int id, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return filmService.getFilmById(id);
+        return userService.getUserById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")
-    public void plusLike(@PathVariable int id, @PathVariable int userId, HttpServletRequest request) {
+    @PutMapping("/{id}/friends/{friendId}")
+    public void plusFriend(@PathVariable int id, @PathVariable int friendId, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        filmService.addLike(userId, id);
+        userService.addFriend(id, friendId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    public void minusLike(@PathVariable int id, @PathVariable int userId, HttpServletRequest request) {
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void minusFriend(@PathVariable int id, @PathVariable int friendId, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        filmService.removeLike(userId, id);
+        userService.removeFriend(id, friendId);
     }
 
-    @GetMapping("/popular?count={count}")
-    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count, HttpServletRequest request) {
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable int id, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return filmService.getMostPopularFilms(count);
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable int id, @PathVariable int otherId, HttpServletRequest request) {
+        log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
+                request.getMethod(), request.getRequestURI(), request.getQueryString());
+
+        return userService.getMutualFriends(id, otherId);
     }
 }

@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -28,6 +30,8 @@ class FilmControllerTest {
     private UserController userController;
     @Autowired
     private MockHttpServletRequest request;
+    @Autowired
+    private FilmService filmService;
 
 
     @BeforeEach
@@ -45,6 +49,11 @@ class FilmControllerTest {
                 "Qwerty",
                 "Afanasiy",
                 LocalDate.of(1993, 11, 15));
+    }
+
+    @AfterEach
+    public void deleteAllFilms() {
+        filmService.deleteAllFilms();
     }
 
     @Test
@@ -83,7 +92,7 @@ class FilmControllerTest {
     public void testIncorrectId_ThrowsValidationException() {
         testFilm.setId(-1);
         NotFoundException exception = assertThrows(NotFoundException.class, () -> filmController.updateFilm(testFilm, request));
-        assertEquals("404. Film not found.", exception.getMessage());
+        assertEquals("Film was not found.", exception.getMessage());
     }
 
     @Test

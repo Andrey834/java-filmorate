@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -25,10 +26,12 @@ class UserControllerTest {
     private UserController userController;
     @Autowired
     private MockHttpServletRequest request;
+    @Autowired
+    private UserService userService;
 
 
     @BeforeEach
-    public void createUser() {
+    void createUser() {
         testUser = new User(
                 1,
                 "donutlover@gmail.com",
@@ -37,57 +40,62 @@ class UserControllerTest {
                 LocalDate.of(1993, 11, 15));
     }
 
+    @AfterEach
+    void deleteAllUser() {
+        userService.deleteAllUsers();
+    }
+
     @Test
-    public void testBlankEmail_ThrowsValidationException() {
+    void testBlankEmail_ThrowsValidationException() {
         testUser.setEmail("");
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
-    public void testEmailContainsSymbol_ThrowsValidationException() {
+    void testEmailContainsSymbol_ThrowsValidationException() {
         testUser.setEmail("memelover@gmail.com@");
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
-    public void testBlankLogin_ThrowsValidationException() {
+    void testBlankLogin_ThrowsValidationException() {
         testUser.setLogin("");
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
-    public void testLoginContainsSpaces_ThrowsValidationException() {
+    void testLoginContainsSpaces_ThrowsValidationException() {
         testUser.setLogin("Super JavaProgrammer2000");
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
-    public void testBirthdayDateAfterCurrentDate_ThrowsValidationException() {
+    void testBirthdayDateAfterCurrentDate_ThrowsValidationException() {
         testUser.setBirthday(LocalDate.now().plusDays(1));
         ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
         assertEquals("Date of birth cannot be in future", exception.getMessage());
     }
 
     @Test
-    public void testBlankName_ThrowsValidationException() {
+    void testBlankName_ThrowsValidationException() {
         testUser.setName("");
         userController.createUser(testUser, request);
         assertEquals(testUser.getName(), testUser.getLogin());
     }
 
     @Test
-    public void testIncorrectId_ThrowsValidationException() {
+    void testIncorrectId_ThrowsValidationException() {
         testUser.setId(-1);
         NotFoundException exception = assertThrows(NotFoundException.class, () -> userController.updateUser(testUser, request));
-        assertEquals("404. User not found.", exception.getMessage());
+        assertEquals("User was not found.", exception.getMessage());
     }
 
     @Test
-    public void testGetUsers_ReturnsAllUsers() {
+    void testGetUsers_ReturnsAllUsers() {
         User testUser2 = userController.createUser(new User(
                 2,
                 "beerlover@yandex.ru",
@@ -107,7 +115,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUserFriends() {
+    void testUserFriends() {
         User friend = userController.createUser(new User(
                 2,
                 "beerlover@yandex.ru",
@@ -181,7 +189,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testGetFilmById() {
+    void testGetUserById() {
         User user1 = userController.createUser(testUser, request);
         User user2 = userController.createUser(testUser, request);
         userController.getUserById(user2.getId(), request);

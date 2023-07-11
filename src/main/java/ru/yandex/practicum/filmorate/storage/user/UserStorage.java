@@ -22,4 +22,6 @@ public interface UserStorage {
     List<User> getFriends(int userId);
 
     List<User> getMutualFriends(int userId, int friendId);
+
+    void deleteAllUsers();
 }

@@ -37,7 +37,10 @@ public class InMemoryUserService implements UserService {
             log.error("EmptyObjectException: User is null.");
             throw new EmptyObjectException("User was not provided");
         }
-
+        if (!userStorage.existsById(user.getId())) { // не очень нравится что объект user будет еще раз создан в методе
+            log.error("NotFoundException: User with id={} was not found.", user.getId());
+            throw new NotFoundException("User was not found.");
+        }
         return userStorage.updateUser(user);
     }
 
@@ -50,7 +53,7 @@ public class InMemoryUserService implements UserService {
     public User getUserById(int userId) {
         if (!userStorage.existsById(userId)) {
             log.error("NotFoundException: User with id={} was not found.", userId);
-            throw new NotFoundException("User not found.");
+            throw new NotFoundException("User was not found.");
         }
         return userStorage.getUserById(userId);
     }
@@ -63,7 +66,7 @@ public class InMemoryUserService implements UserService {
         }
         if (!userStorage.existsById(friendId)) {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
-            throw new NotFoundException("Friend not found.");
+            throw new NotFoundException("Friend was not found.");
         }
 
         userStorage.plusFriend(userId, friendId);
@@ -73,11 +76,11 @@ public class InMemoryUserService implements UserService {
     public void removeFriend(int userId, int friendId) {
         if (!userStorage.existsById(userId)) {
             log.error("NotFoundException: User with id={} was not found.", userId);
-            throw new NotFoundException("User not found.");
+            throw new NotFoundException("User was not found.");
         }
         if (!userStorage.existsById(friendId)) {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
-            throw new NotFoundException("Friend not found.");
+            throw new NotFoundException("Friend was not found.");
         }
 
         userStorage.minusFriend(userId, friendId);
@@ -87,7 +90,7 @@ public class InMemoryUserService implements UserService {
     public List<User> getFriends(int userId) {
         if (!userStorage.existsById(userId)) {
             log.error("NotFoundException: User with id={} was not found.", userId);
-            throw new NotFoundException("User not found.");
+            throw new NotFoundException("User was not found.");
         }
 
         return userStorage.getFriends(userId);
@@ -97,18 +100,29 @@ public class InMemoryUserService implements UserService {
     public List<User> getMutualFriends(int userId, int friendId) {
         if (!userStorage.existsById(userId)) {
             log.error("NotFoundException: User with id={} was not found.", userId);
-            throw new NotFoundException("User not found.");
+            throw new NotFoundException("User was not found.");
         }
         if (!userStorage.existsById(friendId)) {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
-            throw new NotFoundException("Friend not found.");
+            throw new NotFoundException("Friend was not found.");
         }
 
         return userStorage.getMutualFriends(userId, friendId);
     }
 
+    @Override
+    public void deleteAllUsers(){
+        userStorage.deleteAllUsers();
+        setId(0);
+        log.info("User database was clear");
+    }
+
     private int getNextId() {
         return ++id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     private void validation(User user) {
