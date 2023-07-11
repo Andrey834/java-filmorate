@@ -64,8 +64,10 @@ public class FilmController {
         filmService.removeLike(userId, id);
     }
 
-    @GetMapping("/popular?count={count}")
-    public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10") int count, HttpServletRequest request) {
+    @GetMapping("/popular")
+    public List<Film> getMostPopularFilms(
+            @RequestParam(value = "count", defaultValue = "10", required = false) Integer count,
+            HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
