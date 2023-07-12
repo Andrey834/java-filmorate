@@ -40,14 +40,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void plusLike(int userId, int filmId) {
-        Film film = getFilmById(filmId);
+    public void addLike(int userId, int filmId) {
+        Film film = films.get(filmId);
         film.getLikes().add(userId);
     }
 
     @Override
-    public void minusLike(int userId, int filmId) {
-        Film film = getFilmById(filmId);
+    public void removeLike(int userId, int filmId) {
+        Film film = films.get(filmId);
         film.getLikes().remove(userId);
     }
 
@@ -67,8 +67,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public boolean existsById(int filmId) {
-        Film film = getFilmById(filmId);
-        return film != null;
+        return films.containsKey(filmId);
     }
 
     @Override

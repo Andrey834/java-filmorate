@@ -39,7 +39,7 @@ public class InMemoryFilmService implements FilmService {
             log.error("EmptyObjectException: Film is null.");
             throw new EmptyObjectException("Film was not provided.");
         }
-        if (!filmStorage.existsById(film.getId())) { // не очень нравится что объект film будет еще раз создан в методе
+        if (!filmStorage.existsById(film.getId())) {
             log.error("NotFoundException: Film with id={} was not found.", film.getId());
             throw new NotFoundException("Film was not found.");
         }
@@ -64,7 +64,7 @@ public class InMemoryFilmService implements FilmService {
             throw new NotFoundException("Film was not found.");
         }
 
-        filmStorage.plusLike(userId, filmId);
+        filmStorage.addLike(userId, filmId);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class InMemoryFilmService implements FilmService {
             throw new NotFoundException("Film was not found.");
         }
 
-        filmStorage.minusLike(userId, filmId);
+        filmStorage.removeLike(userId, filmId);
     }
 
     @Override
@@ -95,7 +95,8 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film getFilmById(int filmId) {
-        if (!filmStorage.existsById(filmId)) {
+        Film film = filmStorage.getFilmById(filmId);
+        if (film == null) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
             throw new NotFoundException("Film was not found.");
         }
@@ -105,7 +106,7 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public void deleteAllFilms() {
         filmStorage.deleteAllFilms();
-        setId(0);
+        id = 0;
         log.info("Film database was clear");
     }
 
@@ -113,9 +114,6 @@ public class InMemoryFilmService implements FilmService {
         return ++id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     private void validation(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {

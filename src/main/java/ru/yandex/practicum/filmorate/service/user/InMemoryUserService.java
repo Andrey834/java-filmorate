@@ -69,7 +69,7 @@ public class InMemoryUserService implements UserService {
             throw new NotFoundException("Friend was not found.");
         }
 
-        userStorage.plusFriend(userId, friendId);
+        userStorage.addFriend(userId, friendId);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class InMemoryUserService implements UserService {
             throw new NotFoundException("Friend was not found.");
         }
 
-        userStorage.minusFriend(userId, friendId);
+        userStorage.removeFriend(userId, friendId);
     }
 
     @Override
@@ -113,16 +113,12 @@ public class InMemoryUserService implements UserService {
     @Override
     public void deleteAllUsers() {
         userStorage.deleteAllUsers();
-        setId(0);
+        id = 0;
         log.info("User database was clear");
     }
 
     private int getNextId() {
         return ++id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     private void validation(User user) {

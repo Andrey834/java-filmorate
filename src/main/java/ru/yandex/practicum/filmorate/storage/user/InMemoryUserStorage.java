@@ -40,9 +40,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void plusFriend(int userId, int friendId) {
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
+    public void addFriend(int userId, int friendId) {
+        User user = users.get(userId);
+        User friend = users.get(friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
         log.info("Пользователь: id='{}', имя = '{}' добавил в друзья пользователя: id='{}', имя = '{}'",
@@ -50,9 +50,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void minusFriend(int userId, int friendId) {
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
+    public void removeFriend(int userId, int friendId) {
+        User user = users.get(userId);
+        User friend = users.get(friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
     }
@@ -64,7 +64,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getFriends(int userId) {
-        User user = getUserById(userId);
+        User user = users.get(userId);
         Set<Integer> friends = user.getFriends();
 
         return friends.stream()
@@ -74,8 +74,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getMutualFriends(int userId, int friendId) {
-        User user = getUserById(userId);
-        User friend = getUserById(friendId);
+        User user = users.get(userId);
+        User friend = users.get(friendId);
         Set<Integer> otherFriends = user.getFriends();
 
         return otherFriends.stream()
@@ -86,8 +86,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public boolean existsById(int userId) {
-        User user = getUserById(userId);
-        return user != null;
+        return users.containsKey(userId);
     }
 
     @Override
