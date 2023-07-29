@@ -1,59 +1,54 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.entity.User;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserStorage {
     private final UserStorage userStorage;
 
-    public UserService(@Qualifier("inMemoryUserStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
+    @Autowired
+    public UserService(UserDbStorage userDbStorage) {
+        this.userStorage = userDbStorage;
     }
 
-    public boolean addFriend(Long userId, Long friendId) {
-        Optional<User> user = Optional.ofNullable(userStorage.getUser(userId));
-        Optional<User> friend = Optional.ofNullable(userStorage.getUser(friendId));
+    public boolean addFriend(Long userId, Long idFriend) {
+        Optional<User> user = Optional.ofNullable(userStorage.findUserById(userId));
+        Optional<User> friend = Optional.ofNullable(userStorage.findUserById(idFriend));
 
-        if (user.isEmpty() || friend.isEmpty()) {
-            throw new UserNotFoundException("User not found = " + userId + " or " + friendId);
-        }
-
-        userStorage.getUser(userId).getFriends().add(friendId);
-        userStorage.getUser(friendId).getFriends().add(userId);
-        return true;
+        if (user.isEmpty() || friend.isEmpty() || userId.equals(idFriend)) {
+            throw new UserNotFoundException("User not found = " + userId + " or " + idFriend);
+        } else return userStorage.addFriend(userId, idFriend);
     }
 
-    public boolean removeFriend(Long userId, Long friendId) {
-        Optional<User> user = Optional.ofNullable(userStorage.getUser(userId));
-        Optional<User> friend = Optional.ofNullable(userStorage.getUser(friendId));
+    public boolean removeFriend(Long userId, Long idFriend) {
+        Optional<User> user = Optional.ofNullable(userStorage.findUserById(userId));
+        Optional<User> friend = Optional.ofNullable(userStorage.findUserById(idFriend));
 
         if (user.isEmpty() || friend.isEmpty()) {
-            throw new UserNotFoundException("User not found = " + userId + " or " + friendId);
-        }
-
-        userStorage.getUser(userId).getFriends().remove(friendId);
-        userStorage.getUser(friendId).getFriends().remove(userId);
-        return true;
+            throw new UserNotFoundException("User not found = " + userId + " or " + idFriend);
+        } else return userStorage.removeFriend(userId, idFriend);
     }
 
     public List<User> getFriends(Long userId) {
-        Optional<User> user = Optional.ofNullable(userStorage.getUser(userId));
+        Optional<User> user = Optional.ofNullable(userStorage.findUserById(userId));
         if (user.isEmpty()) throw new UserNotFoundException("User not found = " + userId);
 
-        List<Long> friends = new ArrayList<>(userStorage.getUser(userId).getFriends());
+        List<Long> friends = new ArrayList<>(userStorage.findUserById(userId).getFriends());
         return userStorage
-                .getUsers()
+                .findUsers()
                 .stream()
                 .filter(usr -> friends.contains(usr.getId()))
                 .collect(Collectors.toList());
@@ -61,18 +56,18 @@ public class UserService implements UserStorage {
     }
 
     public List<User> getSameFriends(Long userId, Long friendId) {
-        Optional<User> user = Optional.ofNullable(userStorage.getUser(userId));
-        Optional<User> friend = Optional.ofNullable(userStorage.getUser(friendId));
+        Optional<User> user = Optional.ofNullable(userStorage.findUserById(userId));
+        Optional<User> friend = Optional.ofNullable(userStorage.findUserById(friendId));
 
         if (user.isEmpty() || friend.isEmpty()) {
             throw new UserNotFoundException("User not found = " + userId + " or " + friendId);
         }
 
-        List<Long> usersFriends = new ArrayList<>(userStorage.getUser(userId).getFriends());
-        List<Long> sameFriends = new ArrayList<>(userStorage.getUser(friendId).getFriends());
+        List<Long> usersFriends = new ArrayList<>(userStorage.findUserById(userId).getFriends());
+        List<Long> sameFriends = new ArrayList<>(userStorage.findUserById(friendId).getFriends());
 
         return userStorage
-                .getUsers()
+                .findUsers()
                 .stream()
                 .filter(usr -> usersFriends.contains(usr.getId())
                         && sameFriends.contains(usr.getId()))
@@ -80,32 +75,28 @@ public class UserService implements UserStorage {
     }
 
     @Override
-    public User addUser(@Valid User user) {
-        return userStorage.addUser(user);
+    public User save(@Valid User user) {
+        if (user.getName().isEmpty()) user.setName(user.getLogin());
+        return userStorage.save(user);
     }
 
     @Override
-    public User getUser(Long id) {
-        Optional<User> user = Optional.ofNullable(userStorage.getUser(id));
+    public User findUserById(Long id) {
+        Optional<User> user = Optional.ofNullable(userStorage.findUserById(id));
         if (user.isEmpty()) throw new UserNotFoundException("User not found = " + id);
-        return userStorage.getUser(id);
+        else return user.get();
     }
 
     @Override
-    public Set<User> getUsers() {
-        return userStorage.getUsers();
+    public List<User> findUsers() {
+        return userStorage.findUsers();
     }
 
     @Override
-    public boolean removeUser(User user) {
-        return userStorage.removeUser(user);
-    }
-
-    @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         final Long userId = user.getId();
-        Optional<User> updateUser = Optional.ofNullable(userStorage.getUser(userId));
+        Optional<User> updateUser = Optional.ofNullable(userStorage.findUserById(userId));
         if (updateUser.isEmpty()) throw new UserNotFoundException("User not found = " + userId);
-        return userStorage.updateUser(user);
+        return userStorage.update(user);
     }
 }

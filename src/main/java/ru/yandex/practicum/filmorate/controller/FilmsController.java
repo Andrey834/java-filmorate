@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -37,12 +37,12 @@ public class FilmsController {
 
     @GetMapping(value = "/{id}")
     public Film getFilm(@PathVariable Long id) {
-        return filmService.getFilm(id);
+        return filmService.findFilmById(id);
     }
 
     @PutMapping(value = "/{filmId}/like/{userId}")
     public boolean likeFilm(@PathVariable Long filmId, @PathVariable Long userId) {
-        return filmService.doLike(filmId, userId);
+        return filmService.like(filmId, userId);
     }
 
     @DeleteMapping(value = "/{filmId}/like/{userId}")
@@ -51,7 +51,7 @@ public class FilmsController {
     }
 
     @GetMapping(value = "/popular")
-    public List<Film> deleteLikeFilm(
+    public List<Film> getTopFilm(
             @RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
         return filmService.getTopRate(count);
     }

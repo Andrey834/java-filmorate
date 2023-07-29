@@ -3,12 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.entity.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -19,22 +18,22 @@ public class UsersController {
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        return userService.addUser(user);
+        return userService.save(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        return userService.updateUser(user);
+        return userService.update(user);
     }
 
     @GetMapping
-    public Set<User> getUsers() {
-        return userService.getUsers();
+    public List<User> getUsers() {
+        return userService.findUsers();
     }
 
     @GetMapping(value = "/{id}")
     public User getUser(@PathVariable Long id) {
-        return userService.getUser(id);
+        return userService.findUserById(id);
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}")
