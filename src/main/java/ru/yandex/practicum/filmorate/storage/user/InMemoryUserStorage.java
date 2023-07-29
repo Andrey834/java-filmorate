@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.entity.User;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ public class InMemoryUserStorage implements UserStorage {
     private Long id = 0L;
 
     @Override
-    public User addUser(User user) {
+    public User save(User user) {
         final Long idUser = generateId();
         user.setId(idUser);
         if (user.getName().isEmpty()) user.setName(user.getLogin());
@@ -20,19 +20,19 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Long id) {
+    public User findUserById(Long id) {
         if (users.containsKey(id)) {
             return users.get(id);
         }
         return null;
     }
 
-    public Set<User> getUsers() {
-        return new HashSet<>(users.values());
+    public List<User> findUsers() {
+        return new ArrayList<>(users.values());
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         final Long idUser = user.getId();
         if (users.containsKey(idUser)) {
             users.put(idUser, user);
@@ -42,13 +42,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean removeUser(User user) {
-        final Long idUser = id;
-        if (users.containsKey(idUser)) {
-            users.remove(idUser);
-            return true;
-        }
+    public boolean addFriend(Long idUser, Long idFriend) {
         return false;
+    }
+
+    @Override
+    public boolean removeFriend(Long idUser, Long idFriend) {
+        return true;
     }
 
     private Long generateId() {
