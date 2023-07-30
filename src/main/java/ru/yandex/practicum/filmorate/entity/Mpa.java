@@ -25,15 +25,15 @@ public class Mpa {
             case "0":
                 return "UNKNOWN";
             case "1":
-                return MpaName.G.getVale();
+                return MpaName.G.getValue();
             case "2":
-                return MpaName.PG.getVale();
+                return MpaName.PG.getValue();
             case "3":
-                return MpaName.PG13.getVale();
+                return MpaName.PG13.getValue();
             case "4":
-                return MpaName.R.getVale();
+                return MpaName.R.getValue();
             case "5":
-                return MpaName.NC17.getVale();
+                return MpaName.NC17.getValue();
             default:
                 throw new MpaNotFoundException("Mpa not found: " + mpa);
         }

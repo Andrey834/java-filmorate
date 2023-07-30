@@ -13,5 +13,5 @@ public enum GenresName {
     Documentary("Документальный"),
     Action("Боевик");
 
-    private final String vale;
+    private final String value;
 }

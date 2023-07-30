@@ -12,5 +12,5 @@ public enum MpaName {
     R("R"),
     NC17("NC-17");
 
-    private final String vale;
+    private final String value;
 }
