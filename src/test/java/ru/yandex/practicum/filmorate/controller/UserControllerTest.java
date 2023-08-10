@@ -2,16 +2,16 @@ package ru.yandex.practicum.filmorate.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -20,14 +20,15 @@ import java.util.Map;
 
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerTest {
     private User testUser;
     @Autowired
     private UserController userController;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockHttpServletRequest request;
-    @Autowired
-    private UserService userService;
 
 
     @BeforeEach
@@ -38,11 +39,6 @@ class UserControllerTest {
                 "SuperJavaProgrammer2000",
                 "Homer",
                 LocalDate.of(1993, 11, 15));
-    }
-
-    @AfterEach
-    void deleteAllUser() {
-        userService.deleteAllUsers();
     }
 
     @Test

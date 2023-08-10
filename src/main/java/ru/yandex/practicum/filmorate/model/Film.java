@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,10 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class Film {
 
-    private int id;
+    private Integer id;
 
     @NonNull
     private String name;
@@ -26,6 +28,12 @@ public class Film {
 
     private int duration;
 
+    @NonNull
+    private Mpa mpa;
+
     @JsonIgnore
     private final Set<Integer> likes = new HashSet<>();
+
+    @JsonIgnore
+    private final Set<Genre> genres = new HashSet<>();
 }

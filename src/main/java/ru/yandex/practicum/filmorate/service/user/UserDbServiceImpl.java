@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EmptyObjectException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,13 +12,21 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class InMemoryUserService implements UserService {
+public class UserDbServiceImpl implements UserService {
     private int id;
     private final UserStorage userStorage;
+
+    @Autowired
+    public UserDbServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Override
     public User createUser(User user) {
@@ -37,84 +46,89 @@ public class InMemoryUserService implements UserService {
             log.error("EmptyObjectException: User is null.");
             throw new EmptyObjectException("User was not provided");
         }
-        if (!userStorage.existsById(user.getId())) { // не очень нравится что объект user будет еще раз создан в методе
+        if (userStorage.getUserById(user.getId()).isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", user.getId());
             throw new NotFoundException("User was not found.");
         }
-        return userStorage.updateUser(user);
+        return userStorage.updateUser(user).get();
     }
 
     @Override
     public List<User> getUsers() {
-        return userStorage.getUsers();
+        return userStorage.getAllUsers();
     }
 
     @Override
     public User getUserById(int userId) {
-        if (!userStorage.existsById(userId)) {
+        if (userStorage.getUserById(userId).isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
-        return userStorage.getUserById(userId);
+        return userStorage.getUserById(userId).get();
     }
 
     @Override
     public void addFriend(int userId, int friendId) {
-        if (!userStorage.existsById(userId)) {
+        if (userStorage.getUserById(userId).isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User not found.");
         }
-        if (!userStorage.existsById(friendId)) {
+        if (userStorage.getUserById(friendId).isEmpty()) {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
             throw new NotFoundException("Friend was not found.");
         }
-
         userStorage.addFriend(userId, friendId);
     }
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        if (!userStorage.existsById(userId)) {
+        if (userStorage.getUserById(userId).isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
-        if (!userStorage.existsById(friendId)) {
+        if (userStorage.getUserById(friendId).isEmpty()) {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
             throw new NotFoundException("Friend was not found.");
         }
-
         userStorage.removeFriend(userId, friendId);
     }
 
     @Override
     public List<User> getFriends(int userId) {
-        if (!userStorage.existsById(userId)) {
+        Optional<User> user = userStorage.getUserById(userId);
+
+        if (user.isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
 
-        return userStorage.getFriends(userId);
+        return user.get().getFriends().stream()
+                .map(userStorage::getUserById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<User> getMutualFriends(int userId, int friendId) {
-        if (!userStorage.existsById(userId)) {
+        Optional<User> user = userStorage.getUserById(userId);
+        Optional<User> friend = userStorage.getUserById(friendId);
+
+        if (user.isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
-        if (!userStorage.existsById(friendId)) {
+        if (friend.isEmpty()) {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
             throw new NotFoundException("Friend was not found.");
         }
 
-        return userStorage.getMutualFriends(userId, friendId);
-    }
+        Set<Integer> otherFriends = user.get().getFriends();
 
-    @Override
-    public void deleteAllUsers() {
-        userStorage.deleteAllUsers();
-        id = 0;
-        log.info("User database was clear");
+        return otherFriends.stream()
+                .filter(id -> friend.get().getFriends().contains(id))
+                .map(this::getUserById)
+                .collect(Collectors.toList());
     }
 
     private int getNextId() {

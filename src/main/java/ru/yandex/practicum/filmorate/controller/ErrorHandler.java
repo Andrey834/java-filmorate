@@ -23,7 +23,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    // тут лучше подходит HttpStatus.NOT_FOUND или HttpStatus.NO_CONTENT ?
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleEmptyObjectException(final EmptyObjectException e) {

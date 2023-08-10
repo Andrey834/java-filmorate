@@ -20,6 +20,4 @@ public interface UserService {
     List<User> getMutualFriends(int userId, int friendId);
 
     User getUserById(int userId);
-
-    void deleteAllUsers();
 }

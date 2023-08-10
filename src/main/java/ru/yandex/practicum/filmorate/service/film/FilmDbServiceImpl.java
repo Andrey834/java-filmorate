@@ -1,25 +1,41 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EmptyObjectException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class InMemoryFilmService implements FilmService {
+public class FilmDbServiceImpl implements FilmService {
     private int id;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final MpaStorage mpaStorage;
+
+    @Autowired
+    public FilmDbServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                             @Qualifier("userDbStorage") UserStorage userStorage,
+                             MpaStorage mpaStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.mpaStorage = mpaStorage;
+    }
 
     @Override
     public Film createFilm(Film film) {
@@ -27,8 +43,14 @@ public class InMemoryFilmService implements FilmService {
             log.error("EmptyObjectException: Film is null.");
             throw new EmptyObjectException("Film was not provided.");
         }
+
         validation(film);
         film.setId(getNextId());
+        addFilmGenres(film);
+
+        Optional<Mpa> mpa = mpaStorage.getMpaById(film.getMpa().getId());
+        if (mpa.isPresent()) film.setMpa(mpa.get());
+        else throw new NotFoundException("MPA does not exist");
 
         return filmStorage.createFilm(film);
     }
@@ -39,27 +61,33 @@ public class InMemoryFilmService implements FilmService {
             log.error("EmptyObjectException: Film is null.");
             throw new EmptyObjectException("Film was not provided.");
         }
-        if (!filmStorage.existsById(film.getId())) {
+        if (filmStorage.getFilmById(film.getId()).isEmpty()) {
             log.error("NotFoundException: Film with id={} was not found.", film.getId());
             throw new NotFoundException("Film was not found.");
         }
+
         validation(film);
+        addFilmGenres(film);
+
+        Optional<Mpa> mpa = mpaStorage.getMpaById(film.getMpa().getId());
+        if (mpa.isPresent()) film.setMpa(mpa.get());
+        else throw new NotFoundException("MPA does not exist");
 
         return filmStorage.updateFilm(film);
     }
 
     @Override
-    public List<Film> getFilms() {
-        return filmStorage.getFilms();
+    public List<Film> getAllFilms() {
+        return filmStorage.getAllFilms();
     }
 
     @Override
     public void addLike(int userId, int filmId) {
-        if (!userStorage.existsById(userId)) {
+        if (userStorage.getUserById(userId).isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
-        if (!filmStorage.existsById(filmId)) {
+        if (filmStorage.getFilmById(filmId).isEmpty()) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
             throw new NotFoundException("Film was not found.");
         }
@@ -69,11 +97,11 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public void removeLike(int userId, int filmId) {
-        if (!userStorage.existsById(userId)) {
+        if (userStorage.getUserById(userId).isEmpty()) {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
-        if (!filmStorage.existsById(filmId)) {
+        if (filmStorage.getFilmById(filmId).isEmpty()) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
             throw new NotFoundException("Film was not found.");
         }
@@ -83,11 +111,11 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public List<Film> getMostPopularFilms(int count) {
-        if (count > filmStorage.getFilms().size()) {
+        if (count > filmStorage.getAllFilms().size()) {
             log.warn("Указанное пользователем значение count: '{}', значение превышает количество фильмов и будет" +
                             " приравнено к максимальному значению: '{}'",
-                    count, filmStorage.getFilms().size());
-            count = filmStorage.getFilms().size();
+                    count, filmStorage.getAllFilms().size());
+            count = filmStorage.getAllFilms().size();
         }
 
         return filmStorage.getMostPopularFilms(count);
@@ -95,25 +123,17 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film getFilmById(int filmId) {
-        Film film = filmStorage.getFilmById(filmId);
-        if (film == null) {
+        Optional<Film> film = filmStorage.getFilmById(filmId);
+        if (film.isEmpty()) {
             log.error("NotFoundException: Film with id={} was not found.", filmId);
             throw new NotFoundException("Film was not found.");
         }
-        return filmStorage.getFilmById(filmId);
-    }
-
-    @Override
-    public void deleteAllFilms() {
-        filmStorage.deleteAllFilms();
-        id = 0;
-        log.info("Film database was clear");
+        return filmStorage.getFilmById(filmId).get();
     }
 
     private int getNextId() {
         return ++id;
     }
-
 
     private void validation(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
@@ -131,6 +151,25 @@ public class InMemoryFilmService implements FilmService {
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("ValidationException: incorrect release date");
             throw new ValidationException("Incorrect release date");
+        }
+    }
+
+    private void addFilmGenres(Film film) {
+        if (film.getGenres() != null) {
+            Set<Genre> genresSet = film.getGenres();
+            List<Integer> genresIds = new ArrayList<>();
+            for (Genre genre : genresSet) {
+                int id = genre.getId();
+                if (!genresIds.contains(id)) {
+                    genresIds.add(id);
+                }
+            }
+            var genres = filmStorage.getGenresByIds(genresIds);
+            if (genres.size() != genresIds.size()) {
+                throw new NotFoundException("Genre doesn't exist");
+            }
+            film.getGenres().clear();
+            film.getGenres().addAll(genres);
         }
     }
 }

@@ -2,17 +2,19 @@ package ru.yandex.practicum.filmorate.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterEach;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -21,17 +23,21 @@ import java.util.List;
 import java.util.Map;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@RequiredArgsConstructor
 class FilmControllerTest {
     private Film testFilm;
     private User testuser;
+
     @Autowired
     private FilmController filmController;
     @Autowired
     private UserController userController;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockHttpServletRequest request;
-    @Autowired
-    private FilmService filmService;
+
 
 
     @BeforeEach
@@ -41,7 +47,8 @@ class FilmControllerTest {
                 "HappyThreeFriends",
                 "animated flash series about the adventures of several animals",
                 LocalDate.of(1999, 12, 24),
-                5
+                5,
+                new Mpa(1,"R", "Best series")
         );
         testuser = new User(
                 1,
@@ -49,11 +56,6 @@ class FilmControllerTest {
                 "Qwerty",
                 "Afanasiy",
                 LocalDate.of(1993, 11, 15));
-    }
-
-    @AfterEach
-    public void deleteAllFilms() {
-        filmService.deleteAllFilms();
     }
 
     @Test
@@ -102,7 +104,9 @@ class FilmControllerTest {
                 "Simpsons",
                 "animated comedian series",
                 LocalDate.of(1989, 12, 17),
-                30);
+                30,
+                new Mpa(1, "G", "Simpsons forever")
+        );
 
         Map<Integer, Film> users = new HashMap<>();
         users.put(1, testFilm);
