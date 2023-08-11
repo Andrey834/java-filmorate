@@ -125,10 +125,14 @@ public class UserDbServiceImpl implements UserService {
 
         Set<Integer> otherFriends = user.get().getFriends();
 
-        return otherFriends.stream()
+        var friends = otherFriends.stream()
                 .filter(id -> friend.get().getFriends().contains(id))
                 .map(this::getUserById)
                 .collect(Collectors.toList());
+
+        System.out.println(friends);
+        return friends;
+
     }
 
     private int getNextId() {

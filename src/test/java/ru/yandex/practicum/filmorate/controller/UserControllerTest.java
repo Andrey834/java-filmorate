@@ -38,41 +38,67 @@ class UserControllerTest {
                 "donutlover@gmail.com",
                 "SuperJavaProgrammer2000",
                 "Homer",
-                LocalDate.of(1993, 11, 15));
+                LocalDate.of(1993, 11, 15)
+        );
     }
 
     @Test
     void testBlankEmail_ThrowsValidationException() {
         testUser.setEmail("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> userController.createUser(testUser, request)
+        );
+
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
     void testEmailContainsSymbol_ThrowsValidationException() {
         testUser.setEmail("memelover@gmail.com@");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> userController.createUser(testUser, request)
+        );
+
         assertEquals("Incorrect email", exception.getMessage());
     }
 
     @Test
     void testBlankLogin_ThrowsValidationException() {
         testUser.setLogin("");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> userController.createUser(testUser, request)
+        );
+
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
     void testLoginContainsSpaces_ThrowsValidationException() {
         testUser.setLogin("Super JavaProgrammer2000");
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> userController.createUser(testUser, request)
+        );
+
         assertEquals("Incorrect login", exception.getMessage());
     }
 
     @Test
     void testBirthdayDateAfterCurrentDate_ThrowsValidationException() {
         testUser.setBirthday(LocalDate.now().plusDays(1));
-        ValidationException exception = assertThrows(ValidationException.class, () -> userController.createUser(testUser, request));
+
+        ValidationException exception = assertThrows(
+                ValidationException.class,
+                () -> userController.createUser(testUser, request)
+        );
+
         assertEquals("Date of birth cannot be in future", exception.getMessage());
     }
 
@@ -86,7 +112,12 @@ class UserControllerTest {
     @Test
     void testIncorrectId_ThrowsValidationException() {
         testUser.setId(-1);
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> userController.updateUser(testUser, request));
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> userController.updateUser(testUser, request)
+        );
+
         assertEquals("User was not found.", exception.getMessage());
     }
 
@@ -97,7 +128,8 @@ class UserControllerTest {
                 "beerlover@yandex.ru",
                 "BadJavaProgrammer",
                 "Barney Gumble",
-                LocalDate.of(1989, 4, 20)), request);
+                LocalDate.of(1989, 4, 20)), request
+        );
 
         Map<Integer, User> users = new HashMap<>();
         users.put(1, testUser);
@@ -117,20 +149,24 @@ class UserControllerTest {
                 "beerlover@yandex.ru",
                 "BadJavaProgrammer",
                 "Barney Gumble",
-                LocalDate.of(1989, 4, 20)), request);
+                LocalDate.of(1989, 4, 20)), request
+        );
 
         User notFriend = userController.createUser(new User(
                 3,
                 "beerlover@yandex.ru",
                 "BadJavaProgrammer",
                 "Barney Gumble",
-                LocalDate.of(1989, 4, 20)), request);
+                LocalDate.of(1989, 4, 20)), request
+        );
 
         User user = userController.createUser(testUser, request);
         userController.plusFriend(user.getId(), friend.getId(), request);
 
-        assertFalse(user.getFriends().contains(notFriend.getId()));
-        assertTrue(user.getFriends().contains(friend.getId()));
+        User userWithFriend = userController.getUserById(user.getId(), request);
+
+        assertFalse(userWithFriend.getFriends().contains(notFriend.getId()));
+        assertTrue(userWithFriend.getFriends().contains(friend.getId()));
         assertEquals(notFriend.getFriends().size(), 0);
     }
 
@@ -141,7 +177,8 @@ class UserControllerTest {
                 "beerlover@yandex.ru",
                 "BadJavaProgrammer",
                 "Barney Gumble",
-                LocalDate.of(1989, 4, 20)), request);
+                LocalDate.of(1989, 4, 20)), request
+        );
 
         User user = userController.createUser(testUser, request);
         userController.plusFriend(user.getId(), friend.getId(), request);
@@ -160,28 +197,55 @@ class UserControllerTest {
                 "beerlover@yandex.ru",
                 "BadJavaProgrammer",
                 "Barney Gumble",
-                LocalDate.of(1989, 4, 20)), request);
+                LocalDate.of(1989, 4, 20)), request
+        );
 
         User mutualFriend = userController.createUser(new User(
                 3,
                 "friendForAll@yandex.ru",
                 "justAFriendlyGuy",
                 "Doctor Aibolit",
-                LocalDate.of(1960, 4, 11)), request);
+                LocalDate.of(1960, 4, 11)), request
+        );
+
 
         assertEquals(userController.getMutualFriends(user.getId(), friend.getId(), request).size(), 0);
         assertEquals(userController.getMutualFriends(friend.getId(), mutualFriend.getId(), request).size(), 0);
 
         userController.plusFriend(user.getId(), mutualFriend.getId(), request);
         userController.plusFriend(user.getId(), friend.getId(), request);
+        userController.plusFriend(mutualFriend.getId(), user.getId(), request);
         userController.plusFriend(friend.getId(), mutualFriend.getId(), request);
+        userController.plusFriend(friend.getId(), user.getId(), request);
+
+        user = userController.getUserById(user.getId(), request);
+        friend = userController.getUserById(friend.getId(), request);
+        mutualFriend = userController.getUserById(mutualFriend.getId(), request);
 
         assertEquals(userController.getMutualFriends(user.getId(), friend.getId(), request).size(), 1);
         assertEquals(userController.getMutualFriends(friend.getId(), mutualFriend.getId(), request).size(), 1);
 
         assertFalse(userController.getMutualFriends(user.getId(), friend.getId(), request).isEmpty());
-        assertFalse(userController.getMutualFriends(user.getId(), mutualFriend.getId(), request).isEmpty());
+        assertTrue(userController.getMutualFriends(user.getId(), mutualFriend.getId(), request).isEmpty());
         assertFalse(userController.getMutualFriends(friend.getId(), mutualFriend.getId(), request).isEmpty());
+    }
+
+    @Test
+    void userFriendReturnTest() {
+        User user = userController.createUser(testUser, request);
+        User friend = userController.createUser(new User(
+                2,
+                "beerlover@yandex.ru",
+                "BadJavaProgrammer",
+                "Barney Gumble",
+                LocalDate.of(1989, 4, 20)), request
+        );
+
+        userController.plusFriend(user.getId(), friend.getId(), request);
+        User user2 = userController.getUserById(user.getId(), request);
+
+        assertTrue(user2.getFriends().contains(friend.getId()));
+        assertEquals(user2.getFriends().size(), 1);
     }
 
     @Test

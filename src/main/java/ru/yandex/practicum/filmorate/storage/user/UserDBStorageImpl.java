@@ -63,6 +63,8 @@ public class UserDBStorageImpl implements UserStorage {
                 user.getName(),
                 Date.valueOf(user.getBirthday())
         );
+/*        String sql2 = "SELECT * FROM USERS";
+        System.out.println(jdbcTemplate.query(sql2, (rs, rowNum) -> userBuilder(rs)));*/
         log.info("Добавлен новый пользователь с ID={}", user.getId());
         return user;
     }
@@ -95,14 +97,14 @@ public class UserDBStorageImpl implements UserStorage {
                     "WHERE USER_ID = ? AND FRIENDS_ID = ?";
             jdbcTemplate.update(
                     sql,
-                    friendId,
                     userId,
-                    true,
                     friendId,
-                    userId
+                    true,
+                    userId,
+                    friendId
             );
             log.info("Пользователь ID={} подружился с пользователем ID={}", userId, friendId);
-            log.info("Дружба между пользователями ID={} и ID={} стала общей", userId, friendId);
+            log.info("Дружба между пользователями ID={} и ID={} стала взаимной", userId, friendId);
         }
         String sql = "INSERT INTO USER_FRIENDS (USER_ID, FRIENDS_ID, STATUS) VALUES (?, ?, ?)";
         jdbcTemplate.update(
@@ -111,7 +113,9 @@ public class UserDBStorageImpl implements UserStorage {
                 friendId,
                 friendStatus
         );
-        log.info("Пользователь ID={} подружился с пользователем ID={}", friendId, userId);
+        System.out.println(getFriends(userId));
+        System.out.println(getFriends(friendId));
+        log.info("Пользователь ID={} подружился с пользователем ID={}", userId, friendId);
     }
 
     @Override

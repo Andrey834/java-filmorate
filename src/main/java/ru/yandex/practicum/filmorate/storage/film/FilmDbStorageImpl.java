@@ -3,13 +3,13 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
+import java.sql.Date;
 import java.util.*;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -22,31 +22,22 @@ public class FilmDbStorageImpl implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        /*String sql = "INSERT INTO film (id, name, description, duration, release_date, mpa) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO film (id, name, description, duration, release_date, mpa) VALUES(?,?,?,?,?,?)";
         jdbcTemplate.update(sql,
                 film.getId(),
                 film.getName(),
                 film.getDescription(),
                 film.getDuration(),
-                film.getReleaseDate(),
+                Date.valueOf(film.getReleaseDate()),
                 film.getMpa().getId()
-        );*/
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("FILM")
-                .usingGeneratedKeyColumns("ID");
-
-        Map<String, Object> values = new HashMap<>();
-        values.put("ID", film.getId());
-        values.put("NAME", film.getName());
-        values.put("DESCRIPTION", film.getDescription());
-        values.put("DURATION", film.getDuration());
-        values.put("RELEASE_DATE", film.getReleaseDate());
-        values.put("RATING_ID", film.getMpa().getId());
+        );
 
         if (film.getGenres() != null) {
             addGenresToFilm(film);
         }
-        film.setId(simpleJdbcInsert.executeAndReturnKey(values).intValue());
+
+/*      String sql2 = "SELECT * FROM FILM";
+        System.out.println(jdbcTemplate.query(sql2, (rs, rowNum) -> filmBuilder(rs)));*/
         log.info("Создан фильм с ID={}", film.getId());
         return film;
     }
@@ -113,9 +104,9 @@ public class FilmDbStorageImpl implements FilmStorage {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, filmId);
 
         /*Mpa mpa = new Mpa(
-                filmRows.getInt("mpa"),
-                Objects.requireNonNull(filmRows.getString("MPA_NAME")),
-                filmRows.getString("mpa_description")
+                filmRows.getInt("id"),
+                Objects.requireNonNull(filmRows.getString("name")),
+                filmRows.getString("description")
         );*/
 
         if (filmRows.next()) {
@@ -123,8 +114,8 @@ public class FilmDbStorageImpl implements FilmStorage {
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate())
                     .mpa(new Mpa(
                             filmRows.getInt("mpa"),
-                            Objects.requireNonNull(filmRows.getString("MPA_NAME")),
-                            filmRows.getString("mpa_description")))
+                            Objects.requireNonNull(filmRows.getString("NAME")),
+                            filmRows.getString("description")))
                     .description(Objects.requireNonNull(filmRows.getString("description")))
                     .name(Objects.requireNonNull(filmRows.getString("name")))
                     .duration(filmRows.getInt("duration"))
@@ -190,9 +181,9 @@ public class FilmDbStorageImpl implements FilmStorage {
         int id = rs.getInt("id");
 
         Mpa mpa = new Mpa(
-                rs.getInt("mpa_id"),
-                rs.getString("mpa_name"),
-                rs.getString("mpa_description")
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("description")
         );
 
         Film film = Film.builder()
