@@ -32,8 +32,10 @@ class FilmControllerTest {
     private FilmController filmController;
     @Autowired
     private UserController userController;
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") //не знаю из-за чего, но МокСервлетРеквест начал выдавать ошибку
-    @Autowired                                      // якобы не находит бин. Причем эта ошибка появилась после перехода на
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    //не знаю из-за чего, но МокСервлетРеквест начал выдавать ошибку
+    @Autowired
+    // якобы не находит бин. Причем эта ошибка появилась после перехода на
     private MockHttpServletRequest request;         // ultimate издание IDE. Вылечил ошибку только такой аннотацией.
 
     @BeforeEach
@@ -44,7 +46,7 @@ class FilmControllerTest {
                 "animated flash series about the adventures of several animals",
                 LocalDate.of(1999, 12, 24),
                 5,
-                new Mpa(1,"R", "Best series")
+                new Mpa(1, "R", "Best series")
         );
         testUser = new User(
                 1,
@@ -107,8 +109,8 @@ class FilmControllerTest {
         filmController.createFilm(testFilm, request);
         filmController.createFilm(testFilm2, request);
 
-        Film testVal1 = filmController.getFilmById(testFilm.getId(),request);
-        Film testVal2 = filmController.getFilmById(testFilm2.getId(),request);
+        Film testVal1 = filmController.getFilmById(testFilm.getId(), request);
+        Film testVal2 = filmController.getFilmById(testFilm2.getId(), request);
 
         Collection<Film> testCol = new ArrayList<>();
         testCol.add(testVal1);
@@ -126,8 +128,8 @@ class FilmControllerTest {
                 " bibendum arcu vitae elementum. Erat nam at lectus urna duis convallis convallis tellus id." +
                 " Mus mauris vitae ultricies leo integer. Lorem ipsum dolor sit amet, consectetur adipiscing elit," +
                 " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In fermentum posuere urna nec" +
-                " tincidunt. Suspendisse sed nisi lacus sed. Sed turpis tincidunt id aliquet risus. Egestas sed tempus"+
-                " urna et. Malesuada bibendum arcu vitae elementum. Erat nam at lectus urna duis convallis" +
+                " tincidunt. Suspendisse sed nisi lacus sed. Sed turpis tincidunt id aliquet risus. Egestas sed" +
+                " tempus urna et. Malesuada bibendum arcu vitae elementum. Erat nam at lectus urna duis convallis" +
                 " convallis tellus id. Mus mauris vitae ultricies leo integer." +
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor" +
                 " incididunt ut labore et dolore magna aliqua. In fermentum posuere urna nec tincidunt. Suspendisse" +
@@ -135,7 +137,7 @@ class FilmControllerTest {
                 " bibendum arcu vitae elementum. Erat nam at lectus urna duis convallis convallis tellus id." +
                 " Mus mauris vitae ultricies leo integer. Lorem ipsum dolor sit amet, consectetur adipiscing elit," +
                 " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In fermentum posuere urna nec" +
-                " tincidunt. Suspendisse sed nisi lacus sed. Sed turpis tincidunt id aliquet risus. Egestas sed tempus"+
+                " tincidunt. Suspendisse sed nisi lacus sed. Sed turpis tincidunt id aliquet risus. Egestas sed tempus" +
                 " urna et. Malesuada bibendum arcu vitae elementum. Erat nam at lectus urna duis convallis" +
                 " convallis tellus id. Mus mauris vitae ultricies leo integer."
         );
@@ -146,6 +148,7 @@ class FilmControllerTest {
         );
         assertEquals("Incorrect length", exception.getMessage());
     }
+
     @Test
     public void default0LikesTest() {
         Film film = filmController.createFilm(testFilm, request);
@@ -160,7 +163,7 @@ class FilmControllerTest {
         User user = userController.createUser(testUser, request);
         filmController.plusLike(filmBeforeLike.getId(), user.getId(), request);
 
-        Film filmAfterLike = filmController.getFilmById(filmBeforeLike.getId(),request);
+        Film filmAfterLike = filmController.getFilmById(filmBeforeLike.getId(), request);
         assertTrue(filmAfterLike.getLikes().contains(user.getId()));
         assertEquals(filmAfterLike.getLikes().size(), 1);
     }
@@ -171,12 +174,12 @@ class FilmControllerTest {
         User user = userController.createUser(testUser, request);
         filmController.plusLike(film.getId(), user.getId(), request);
 
-        Film filmAfterLike = filmController.getFilmById(film.getId(),request);
+        Film filmAfterLike = filmController.getFilmById(film.getId(), request);
         assertTrue(filmAfterLike.getLikes().contains(user.getId()));
         assertEquals(filmAfterLike.getLikes().size(), 1);
 
         filmController.minusLike(filmAfterLike.getId(), user.getId(), request);
-        Film filmWithoutLike = filmController.getFilmById(filmAfterLike.getId(),request);
+        Film filmWithoutLike = filmController.getFilmById(filmAfterLike.getId(), request);
         assertFalse(filmWithoutLike.getLikes().contains(user.getId()));
         assertEquals(filmWithoutLike.getLikes().size(), 0);
     }
