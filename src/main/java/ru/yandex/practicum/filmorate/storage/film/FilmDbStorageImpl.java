@@ -55,13 +55,13 @@ public class FilmDbStorageImpl implements FilmStorage {
     public Film updateFilm(Film film) {
         String sql = "UPDATE FILM SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA = ?" +
                 "WHERE ID = ?";
-        jdbcTemplate.update(sql
-                , film.getName()
-                , film.getDescription()
-                , film.getReleaseDate()
-                , film.getDuration()
-                , film.getMpa().getId()
-                , film.getId()
+        jdbcTemplate.update(sql,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId()
         );
         updateFilmGenre(film);
 
