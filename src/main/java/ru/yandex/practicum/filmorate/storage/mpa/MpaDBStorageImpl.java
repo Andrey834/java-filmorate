@@ -42,6 +42,6 @@ public class MpaDBStorageImpl implements MpaStorage {
         return new Mpa(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
-                resultSet.getString("mpa_description"));
+                resultSet.getString("description"));
     }
 }

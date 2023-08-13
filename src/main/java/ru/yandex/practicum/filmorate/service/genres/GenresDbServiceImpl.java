@@ -27,5 +27,4 @@ public class GenresDbServiceImpl implements GenresService {
     public List<Genre> getAllGenres() {
         return storage.getAllGenres();
     }
-
 }

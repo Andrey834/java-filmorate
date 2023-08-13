@@ -8,11 +8,13 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MpaDbServiceImpl implements MpaService {
     private final MpaStorage storage;
+
     @Override
     public Mpa getMpaById(int id) {
         if (storage.getMpaById(id).isEmpty()) {

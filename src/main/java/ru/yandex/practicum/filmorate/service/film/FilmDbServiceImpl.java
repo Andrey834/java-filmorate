@@ -15,10 +15,11 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,6 +29,7 @@ public class FilmDbServiceImpl implements FilmService {
     private final UserStorage userStorage;
     private final MpaStorage mpaStorage;
 
+    // проще было через @RequiredArgsConstructor, но решил так потренироваться.
     @Autowired
     public FilmDbServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                              @Qualifier("userDbStorage") UserStorage userStorage,
@@ -157,14 +159,14 @@ public class FilmDbServiceImpl implements FilmService {
     private void addFilmGenres(Film film) {
         if (film.getGenres() != null) {
             Set<Genre> genresSet = film.getGenres();
-            List<Integer> genresIds = new ArrayList<>();
-            for (Genre genre : genresSet) {
-                int id = genre.getId();
-                if (!genresIds.contains(id)) {
-                    genresIds.add(id);
-                }
-            }
-            var genres = filmStorage.getGenresByIds(genresIds);
+
+            List<Integer> genresIds = genresSet.stream()
+                    .sorted(Comparator.comparing(Genre::getId))
+                    .map(Genre::getId)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            Set<Genre> genres = filmStorage.getGenresByIds(genresIds);
             if (genres.size() != genresIds.size()) {
                 throw new NotFoundException("Genre doesn't exist");
             }

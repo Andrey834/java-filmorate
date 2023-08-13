@@ -63,8 +63,6 @@ public class UserDBStorageImpl implements UserStorage {
                 user.getName(),
                 Date.valueOf(user.getBirthday())
         );
-/*        String sql2 = "SELECT * FROM USERS";
-        System.out.println(jdbcTemplate.query(sql2, (rs, rowNum) -> userBuilder(rs)));*/
         log.info("Добавлен новый пользователь с ID={}", user.getId());
         return user;
     }
@@ -113,8 +111,6 @@ public class UserDBStorageImpl implements UserStorage {
                 friendId,
                 friendStatus
         );
-        System.out.println(getFriends(userId));
-        System.out.println(getFriends(friendId));
         log.info("Пользователь ID={} подружился с пользователем ID={}", userId, friendId);
     }
 

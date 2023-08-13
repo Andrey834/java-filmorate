@@ -23,8 +23,4 @@ public interface FilmStorage {
     Optional<Film> getFilmById(Integer filmId);
 
     Set<Genre> getGenresByIds(List<Integer> ids);
-
-    //boolean existsById(int filmId);
-
-    //void deleteAllFilms();
 }
