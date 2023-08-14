@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -78,6 +78,6 @@ public class UserController {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return userService.getMutualFriends(id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }

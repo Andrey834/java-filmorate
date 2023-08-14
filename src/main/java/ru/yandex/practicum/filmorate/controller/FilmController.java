@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -37,7 +37,7 @@ public class FilmController {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
                 request.getMethod(), request.getRequestURI(), request.getQueryString());
 
-        return filmService.getFilms();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")

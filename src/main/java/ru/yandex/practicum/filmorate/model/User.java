@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class User {
 
