@@ -13,8 +13,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -100,16 +98,11 @@ public class UserDbServiceImpl implements UserService {
             log.error("NotFoundException: User with id={} was not found.", userId);
             throw new NotFoundException("User was not found.");
         }
-
-        return user.get().getFriends().stream()
-                .map(userStorage::getUserById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        return userStorage.getFriends(userId);
     }
 
     @Override
-    public List<User> getMutualFriends(int userId, int friendId) {
+    public List<User> getCommonFriends(int userId, int friendId) {
         Optional<User> user = userStorage.getUserById(userId);
         Optional<User> friend = userStorage.getUserById(friendId);
 
@@ -121,17 +114,7 @@ public class UserDbServiceImpl implements UserService {
             log.error("NotFoundException: Friend with id={} was not found.", friendId);
             throw new NotFoundException("Friend was not found.");
         }
-
-        Set<Integer> otherFriends = user.get().getFriends();
-
-        var friends = otherFriends.stream()
-                .filter(id -> friend.get().getFriends().contains(id))
-                .map(this::getUserById)
-                .collect(Collectors.toList());
-
-        System.out.println(friends);
-        return friends;
-
+        return userStorage.getCommonFriends(userId, friendId);
     }
 
     private int getNextId() {

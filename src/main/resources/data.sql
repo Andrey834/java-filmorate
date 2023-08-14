@@ -1,4 +1,4 @@
-INSERT INTO genre (name)
+INSERT INTO genres (name)
 VALUES ('Комедия'),
        ('Драма'),
        ('Мультфильм'),

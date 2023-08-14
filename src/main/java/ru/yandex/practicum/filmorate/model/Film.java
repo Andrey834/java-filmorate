@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class Film {
 
-    private Integer id;
+    private int id;
 
     @NonNull
     private String name;

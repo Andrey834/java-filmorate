@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.sql.ResultSet;
 
-@Component
+@Component("mpaDbStorage")
 @RequiredArgsConstructor
 public class MpaDBStorageImpl implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;

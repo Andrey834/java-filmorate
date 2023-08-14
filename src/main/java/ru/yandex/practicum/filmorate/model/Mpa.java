@@ -9,7 +9,7 @@ import lombok.NonNull;
 public class Mpa {
 
     @NonNull
-    private Integer id;
+    private int id;
 
     private String name;
 

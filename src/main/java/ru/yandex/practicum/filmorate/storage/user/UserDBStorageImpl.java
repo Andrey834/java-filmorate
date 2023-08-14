@@ -25,7 +25,6 @@ public class UserDBStorageImpl implements UserStorage {
     @Override
     public List<User> getAllUsers() {
         String sql = "SELECT * FROM USERS";
-
         return jdbcTemplate.query(sql, (rs, rowNum) -> userBuilder(rs));
     }
 
@@ -43,7 +42,7 @@ public class UserDBStorageImpl implements UserStorage {
                     .birthday(Objects.requireNonNull(userRows.getDate("birthday")).toLocalDate())
                     .build();
 
-            user.getFriends().addAll(Objects.requireNonNull(getFriends(userId)));
+            user.getFriends().addAll(Objects.requireNonNull(getFriendListIds(userId)));
             log.info("Найден пользователь с ID={}", userId);
             return Optional.of(user);
         } else {
@@ -91,7 +90,8 @@ public class UserDBStorageImpl implements UserStorage {
         boolean friendStatus = false;
         if (friend.getFriends().contains(userId)) {
             friendStatus = true;
-            String sql = "UPDATE USER_FRIENDS SET USER_ID = ? AND FRIENDS_ID = ? AND STATUS = ? " +
+            String sql = "UPDATE USER_FRIENDS " +
+                    "SET USER_ID = ? AND FRIENDS_ID = ? AND STATUS = ? " +
                     "WHERE USER_ID = ? AND FRIENDS_ID = ?";
             jdbcTemplate.update(
                     sql,
@@ -118,11 +118,13 @@ public class UserDBStorageImpl implements UserStorage {
     public void removeFriend(int userId, int friendId) {
         User friend = getUserById(friendId).get();
 
-        String sql = "DELETE FROM USER_FRIENDS WHERE USER_ID = ? AND FRIENDS_ID = ?";
+        String sql = "DELETE FROM USER_FRIENDS " +
+                "WHERE USER_ID = ? AND FRIENDS_ID = ?";
         jdbcTemplate.update(sql, userId, friendId);
         log.info("Пользователь ID={} удалил из друзей пользователя ID={}", userId, friendId);
         if (friend.getFriends().contains(userId)) {
-            sql = "UPDATE USER_FRIENDS SET USER_ID = ? AND FRIENDS_ID = ? AND STATUS = ? " +
+            sql = "UPDATE USER_FRIENDS " +
+                    "SET USER_ID = ? AND FRIENDS_ID = ? AND STATUS = ? " +
                     "WHERE USER_ID = ? AND FRIENDS_ID = ?";
             jdbcTemplate.update(
                     sql,
@@ -136,8 +138,29 @@ public class UserDBStorageImpl implements UserStorage {
         }
     }
 
-    private List<Integer> getFriends(int userId) {
-        String sql = "SELECT FRIENDS_ID FROM USER_FRIENDS WHERE USER_ID = ?";
+    public List<User> getFriends(int userId) {
+        String sql = "SELECT FRIENDS_ID AS id, NAME, LOGIN, EMAIL, BIRTHDAY " +
+                "FROM USER_FRIENDS AS uf " +
+                "JOIN users AS u ON uf.FRIENDS_ID = u.id " +
+                "WHERE uf.user_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> userBuilder(rs), userId);
+    }
+
+    public List<User> getCommonFriends(int userId, int friendId) {
+        String sql = "SELECT FRIENDS_ID AS id, NAME, LOGIN, EMAIL, BIRTHDAY " +
+                "FROM USER_FRIENDS AS uf " +
+                "JOIN users AS u ON uf.FRIENDS_ID = u.id " +
+                "WHERE USER_ID = ? AND u.id IN ( " +
+                "    SELECT FRIENDS_ID " +
+                "    FROM USER_FRIENDS " +
+                "    WHERE USER_ID = ?)";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> userBuilder(rs), userId, friendId);
+    }
+
+    private List<Integer> getFriendListIds(int userId) {
+        String sql = "SELECT FRIENDS_ID " +
+                "FROM USER_FRIENDS " +
+                "WHERE USER_ID = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("friends_id"), userId);
     }
 
@@ -151,7 +174,7 @@ public class UserDBStorageImpl implements UserStorage {
                 .birthday(Objects.requireNonNull(rs.getDate("birthday")).toLocalDate())
                 .build();
 
-        user.getFriends().addAll(getFriends(id));
+        user.getFriends().addAll(getFriendListIds(id));
         return user;
     }
 }

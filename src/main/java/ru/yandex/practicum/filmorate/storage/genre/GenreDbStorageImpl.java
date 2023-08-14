@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.genres;
+package ru.yandex.practicum.filmorate.storage.genre;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,21 +11,24 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
-@Component
+@Component("genreDbStorage")
 @RequiredArgsConstructor
-public class GenresDbStorageImpl implements GenresStorage {
+public class GenreDbStorageImpl implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Genre> getAllGenres() {
-        String sql = "SELECT * FROM GENRE";
+        String sql = "SELECT * FROM GENRES";
         return jdbcTemplate.query(sql, (rs, rowNum) -> genreBuilder(rs));
     }
 
     @Override
     public Optional<Genre> getGenreById(Integer id) {
-        String sql = "SELECT * FROM GENRE WHERE ID = ?";
+        String sql = "SELECT * FROM GENRES WHERE ID = ?";
         SqlRowSet genreRow = jdbcTemplate.queryForRowSet(sql, id);
         if (genreRow.next()) {
             Genre genre = new Genre(
@@ -36,6 +39,24 @@ public class GenresDbStorageImpl implements GenresStorage {
         } else {
             return Optional.empty();
         }
+    }
+
+    public Set<Genre> getGenresListByIds(List<Integer> ids) {
+        Set<Genre> genres = new HashSet<>();
+
+        String copies = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sql = String.format("SELECT * FROM GENRES WHERE ID IN (%s)", copies);
+
+        List<Genre> result = jdbcTemplate.query(
+                sql,
+                ids.toArray(),
+                (rs, rowNum) -> genreBuilder(rs)
+        );
+
+        if (!result.isEmpty()) {
+            genres.addAll(result);
+        }
+        return genres;
     }
 
     private Genre genreBuilder(ResultSet resultSet) throws SQLException {

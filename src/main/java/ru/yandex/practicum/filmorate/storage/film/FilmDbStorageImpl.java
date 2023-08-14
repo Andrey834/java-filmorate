@@ -17,8 +17,6 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -30,7 +28,7 @@ public class FilmDbStorageImpl implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        String sql = "INSERT INTO film (id, name, description, duration, release_date, mpa) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO FILMS (id, name, description, duration, release_date, mpa) VALUES (?,?,?,?,?,?)";
         jdbcTemplate.update(sql,
                 film.getId(),
                 film.getName(),
@@ -53,7 +51,8 @@ public class FilmDbStorageImpl implements FilmStorage {
     }
 
     public Film updateFilm(Film film) {
-        String sql = "UPDATE FILM SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA = ?" +
+        String sql = "UPDATE FILMS " +
+                "SET NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA = ?" +
                 "WHERE ID = ?";
         jdbcTemplate.update(sql,
                 film.getName(),
@@ -70,24 +69,14 @@ public class FilmDbStorageImpl implements FilmStorage {
     }
 
     public List<Film> getAllFilms() {
-        String sql = "SELECT FILM.*, MPA.NAME, MPA.ID, MPA.DESCRIPTION FROM film INNER JOIN MPA ON FILM.MPA = MPA.ID";
+        String sql = "SELECT * FROM FILMS AS f, MPA AS m where f.MPA = m.ID";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> filmBuilder(rs));
     }
 
-    public void addLike(int userId, int filmId) {
-        String sql = "INSERT INTO FILM_LIKES (USER_ID, FILM_ID) VALUES(?,?)";
-        jdbcTemplate.update(sql, userId, filmId);
-    }
-
-    public void removeLike(int userId, int filmId) {
-        String sql = "DELETE FROM FILM_LIKES WHERE USER_ID = ? AND FILM_ID = ?";
-        jdbcTemplate.update(sql, userId, filmId);
-    }
-
     public List<Film> getMostPopularFilms(int count) {
         String sql = "SELECT f.*, MPA.ID, MPA.NAME, MPA.DESCRIPTION " +
-                "FROM FILM AS f " +
+                "FROM FILMS AS f " +
                 "INNER JOIN MPA ON f.MPA = MPA.ID " +
                 "LEFT OUTER JOIN FILM_LIKES AS fl ON f.ID = fl.FILM_ID " +
                 "GROUP BY f.ID, fl.USER_ID " +
@@ -100,14 +89,13 @@ public class FilmDbStorageImpl implements FilmStorage {
             film.getGenres().addAll(getFilmGenres(film.getId()));
             film.getLikes().addAll(getUserLikes(film.getId()));
         }
-
         return films;
     }
 
     public Optional<Film> getFilmById(Integer filmId) {
 
         String sql = "SELECT f.*, m.name AS mpa_name, m.DESCRIPTION AS mpa_description " +
-                "FROM film AS f " +
+                "FROM FILMS AS f " +
                 "JOIN mpa AS m ON f.mpa = m.id " +
                 "AND f.id = ?";
 
@@ -135,22 +123,12 @@ public class FilmDbStorageImpl implements FilmStorage {
         }
     }
 
-    public Set<Genre> getGenresByIds(List<Integer> ids) {
-        Set<Genre> genres = new HashSet<>();
-        for (Integer id : ids) {
-            String sql = "SELECT * from GENRE WHERE ID = ?";
-            List<Genre> result = jdbcTemplate.query(sql, (rs, rowNum) -> genreBuilder(rs), id);
-            if (!result.isEmpty()) {
-                genres.addAll(result);
-            }
-        }
-        return genres;
-    }
-
     private void updateFilmGenre(Film film) {
 
         List<Genre> incomingGenres = new ArrayList<>(film.getGenres());
         List<Genre> filmGenresInDb = getFilmGenres(film.getId());
+
+        if (incomingGenres.isEmpty() && filmGenresInDb.isEmpty()) return;
 
         List<Integer> genresIdsShouldBeDeleted = filmGenresInDb.stream()
                 .filter(genre -> !incomingGenres.contains(genre))
@@ -168,18 +146,19 @@ public class FilmDbStorageImpl implements FilmStorage {
     }
 
     private void deleteGenresFromFilm(Film film, List<Integer> genresIdsShouldBeDeleted) {
-        String sql = "DELETE FROM FILM_GENRE WHERE FILM_ID = ? AND GENRE_ID = ?";
+        String sql = "DELETE FROM FILM_GENRES WHERE FILM_ID = ? AND GENRE_ID = ?";
         batchUpdate(film, genresIdsShouldBeDeleted, sql);
     }
 
     private void addGenresToFilm(Film film, List<Integer> genresIdsShouldBeAdded) {
-        String sql = "INSERT INTO FILM_GENRE (film_id, genre_id) VALUES (?, ?)";
+        String sql = "INSERT INTO FILM_GENRES (film_id, genre_id) VALUES (?, ?)";
         batchUpdate(film, genresIdsShouldBeAdded, sql);
     }
 
     private List<Genre> getFilmGenres(Integer filmId) {
-        String sql = "SELECT * FROM GENRE JOIN FILM_GENRE ON FILM_GENRE.GENRE_ID = GENRE.ID " +
-                "AND FILM_GENRE.FILM_ID = ?";
+        String sql = "SELECT * FROM GENRES " +
+                "JOIN FILM_GENRES ON FILM_GENRES.GENRE_ID = GENRES.ID " +
+                "AND FILM_GENRES.FILM_ID = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> genreBuilder(rs), filmId);
     }
 

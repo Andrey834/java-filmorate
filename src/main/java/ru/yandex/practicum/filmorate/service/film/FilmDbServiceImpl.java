@@ -11,8 +11,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -28,14 +30,20 @@ public class FilmDbServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final MpaStorage mpaStorage;
+    private final LikeStorage likeStorage;
+    private final GenreStorage genreStorage;
 
-    // проще было через @RequiredArgsConstructor, но решил так потренироваться.
+
     @Autowired
     public FilmDbServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                              @Qualifier("userDbStorage") UserStorage userStorage,
-                             MpaStorage mpaStorage) {
+                             @Qualifier("likeDbStorage") LikeStorage likeStorage,
+                             @Qualifier("genreDbStorage") GenreStorage genreStorage,
+                             @Qualifier("mpaDbStorage") MpaStorage mpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.likeStorage = likeStorage;
+        this.genreStorage = genreStorage;
         this.mpaStorage = mpaStorage;
     }
 
@@ -94,7 +102,7 @@ public class FilmDbServiceImpl implements FilmService {
             throw new NotFoundException("Film was not found.");
         }
 
-        filmStorage.addLike(userId, filmId);
+        likeStorage.addLike(userId, filmId);
     }
 
     @Override
@@ -108,7 +116,7 @@ public class FilmDbServiceImpl implements FilmService {
             throw new NotFoundException("Film was not found.");
         }
 
-        filmStorage.removeLike(userId, filmId);
+        likeStorage.removeLike(userId, filmId);
     }
 
     @Override
@@ -166,7 +174,7 @@ public class FilmDbServiceImpl implements FilmService {
                     .distinct()
                     .collect(Collectors.toList());
 
-            Set<Genre> genres = filmStorage.getGenresByIds(genresIds);
+            Set<Genre> genres = genreStorage.getGenresListByIds(genresIds);
             if (genres.size() != genresIds.size()) {
                 throw new NotFoundException("Genre doesn't exist");
             }
