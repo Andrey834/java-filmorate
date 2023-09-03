@@ -15,9 +15,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Collections;
 
-@Component("genreDbStorage")
+@Component("genreStorage")
 @RequiredArgsConstructor
-public class GenreDbStorageImpl implements GenreStorage {
+public class GenreStorageImpl implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -27,7 +27,7 @@ public class GenreDbStorageImpl implements GenreStorage {
     }
 
     @Override
-    public Optional<Genre> getGenreById(Integer id) {
+    public Optional<Genre> getGenreById(int id) {
         String sql = "SELECT * FROM GENRES WHERE ID = ?";
         SqlRowSet genreRow = jdbcTemplate.queryForRowSet(sql, id);
         if (genreRow.next()) {
@@ -49,8 +49,8 @@ public class GenreDbStorageImpl implements GenreStorage {
 
         List<Genre> result = jdbcTemplate.query(
                 sql,
-                ids.toArray(),
-                (rs, rowNum) -> genreBuilder(rs)
+                (rs, rowNum) -> genreBuilder(rs),
+                ids.toArray()
         );
 
         if (!result.isEmpty()) {

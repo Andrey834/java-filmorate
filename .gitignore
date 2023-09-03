@@ -1,3 +1,5 @@
+db
+/db/
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -54,4 +56,4 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
+.vscode/!/db/

@@ -22,14 +22,16 @@ public class MpaController {
     @GetMapping("/{id}")
     public Mpa getMpa(@PathVariable int id, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+                request.getMethod(), request.getRequestURI(), request.getQueryString()
+        );
         return service.getMpaById(id);
     }
 
     @GetMapping()
     public List<Mpa> getAll(HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+                request.getMethod(), request.getRequestURI(), request.getQueryString()
+        );
         return service.getAllMpa();
     }
 }

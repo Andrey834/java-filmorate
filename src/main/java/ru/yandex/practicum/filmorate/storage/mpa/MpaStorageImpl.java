@@ -12,9 +12,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.sql.ResultSet;
 
-@Component("mpaDbStorage")
+@Component("mpaStorage")
 @RequiredArgsConstructor
-public class MpaDBStorageImpl implements MpaStorage {
+public class MpaStorageImpl implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -24,7 +24,7 @@ public class MpaDBStorageImpl implements MpaStorage {
     }
 
     @Override
-    public Optional<Mpa> getMpaById(Integer mpaId) {
+    public Optional<Mpa> getMpaById(int mpaId) {
         String sql = "SELECT * FROM MPA WHERE ID = ?";
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet(sql, mpaId);
         if (mpaRows.next()) {

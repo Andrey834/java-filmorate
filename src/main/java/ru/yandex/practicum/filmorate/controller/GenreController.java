@@ -22,14 +22,16 @@ public class GenreController {
     @GetMapping("/{id}")
     public Genre getGenre(@PathVariable int id, HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+                request.getMethod(), request.getRequestURI(), request.getQueryString()
+        );
         return service.getGenreById(id);
     }
 
     @GetMapping()
     public List<Genre> getAll(HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}', Строка параметров запроса: '{}'",
-                request.getMethod(), request.getRequestURI(), request.getQueryString());
+                request.getMethod(), request.getRequestURI(), request.getQueryString()
+        );
         return service.getAllGenres();
     }
 }

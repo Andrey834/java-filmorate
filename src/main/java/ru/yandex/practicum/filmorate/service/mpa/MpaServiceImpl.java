@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MpaDbServiceImpl implements MpaService {
+public class MpaServiceImpl implements MpaService {
     private final MpaStorage storage;
 
     @Override

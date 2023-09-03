@@ -11,11 +11,17 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,8 +30,11 @@ import java.util.Map;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerTest {
     private User testUser;
+    private Film testFilm;
     @Autowired
     private UserController userController;
+    @Autowired
+    private FilmController filmController;
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockHttpServletRequest request;
@@ -39,6 +48,14 @@ class UserControllerTest {
                 "SuperJavaProgrammer2000",
                 "Homer",
                 LocalDate.of(1993, 11, 15)
+        );
+        testFilm = new Film(
+                1,
+                "HappyThreeFriends",
+                "animated flash series about the adventures of several animals",
+                LocalDate.of(1999, 12, 24),
+                5,
+                new Mpa(1, "R", "Best series")
         );
     }
 
@@ -123,13 +140,12 @@ class UserControllerTest {
 
     @Test
     void testGetUsers_ReturnsAllUsers() {
-        User testUser2 = userController.createUser(new User(
+        User testUser2 = new User(
                 2,
                 "beerlover@yandex.ru",
                 "BadJavaProgrammer",
                 "Barney Gumble",
-                LocalDate.of(1989, 4, 20)), request
-        );
+                LocalDate.of(1989, 4, 20));
 
         Map<Integer, User> users = new HashMap<>();
         users.put(1, testUser);
@@ -255,5 +271,135 @@ class UserControllerTest {
         userController.getUserById(user2.getId(), request);
 
         assertEquals(2, user2.getId());
+    }
+
+    @Test
+    public void testDeleteUser() {
+        User user = userController.createUser(testUser, request);
+        int actualSizeList = userController.getUsers(request).size();
+        assertEquals(1, actualSizeList);
+
+        userController.deleteUser(user.getId(), request);
+        actualSizeList = userController.getUsers(request).size();
+
+        assertEquals(0, actualSizeList);
+    }
+
+    @Test
+    void testGetRecommendationsByExistingUserId() {
+        User testUser2 = new User(2, "homerlover@gmail.com",
+                "SuperWifeOfJavaProgrammer2000",
+                "Marge",
+                LocalDate.of(1993, 11, 16));
+        Film testFilm2 = new Film(2,
+                "Green Elephant",
+                "Very kind and educational movie for children",
+                LocalDate.of(1999, 8, 24),
+                86,
+                new Mpa(1, "G", "All ages admitted"));
+        User user1 = userController.createUser(testUser, request);
+        User user2 = userController.createUser(testUser2, request);
+        Film film1 = filmController.createFilm(testFilm, request);
+        Film film2 = filmController.createFilm(testFilm2, request);
+        filmController.plusLike(film1.getId(), user1.getId(), request);
+        filmController.plusLike(film1.getId(), user2.getId(), request);
+        filmController.plusLike(film2.getId(), user2.getId(), request);
+        Film film1AfterLikes = filmController.getFilmById(1, request);
+        Film film2AfterLikes = filmController.getFilmById(2, request);
+
+        assertEquals(2, film1AfterLikes.getLikes().size());
+        assertEquals(1, film2AfterLikes.getLikes().size());
+
+        List<Film> user1Recommendations = userController.getRecommendations(1, request);
+
+        assertEquals(1, user1Recommendations.size());
+        assertTrue(user1Recommendations.contains(film2AfterLikes));
+    }
+
+    @Test
+    void testGetRecommendationsByNonExistingUserId() {
+        NotFoundException ex = assertThrows(
+                NotFoundException.class, () -> userController.getRecommendations(999, request));
+
+        assertEquals("User was not found.", ex.getMessage());
+    }
+
+    @Test
+    void testGetRecommendationsWithNoLikes() {
+        User testUser2 = new User(2, "homerlover@gmail.com",
+                "SuperWifeOfJavaProgrammer2000",
+                "Marge",
+                LocalDate.of(1993, 11, 16));
+        User user1 = userController.createUser(testUser, request);
+        User user2 = userController.createUser(testUser2, request);
+        List<Film> user1Recommendations = userController.getRecommendations(1, request);
+
+        assertEquals(0, user1Recommendations.size());
+    }
+
+    @Test
+    void testGetRecommendationsWithNoCommonLikes() {
+        User testUser2 = new User(2, "homerlover@gmail.com",
+                "SuperWifeOfJavaProgrammer2000",
+                "Marge",
+                LocalDate.of(1993, 11, 16));
+        Film testFilm2 = new Film(2,
+                "Green Elephant",
+                "Very kind and educational movie for children",
+                LocalDate.of(1999, 8, 24),
+                86,
+                new Mpa(1, "G", "All ages admitted"));
+        User user1 = userController.createUser(testUser, request);
+        User user2 = userController.createUser(testUser2, request);
+        Film film1 = filmController.createFilm(testFilm, request);
+        Film film2 = filmController.createFilm(testFilm2, request);
+        filmController.plusLike(film1.getId(), user1.getId(), request);
+        filmController.plusLike(film2.getId(), user2.getId(), request);
+        Film film1AfterLikes = filmController.getFilmById(1, request);
+        Film film2AfterLikes = filmController.getFilmById(2, request);
+
+        assertEquals(1, film1AfterLikes.getLikes().size());
+        assertEquals(1, film2AfterLikes.getLikes().size());
+
+        List<Film> user1Recommendations = userController.getRecommendations(1, request);
+
+        assertEquals(0, user1Recommendations.size());
+    }
+
+    @Test
+    void testGetEvents() {
+        User testUser2 = new User(2, "homerlover@gmail.com",
+                "SuperWifeOfJavaProgrammer2000",
+                "Marge",
+                LocalDate.of(1993, 11, 16));
+
+        User user1 = userController.createUser(testUser, request);
+        User user2 = userController.createUser(testUser2, request);
+
+        List<Event> events = userController.getUserEvents(user1.getId(), request);
+
+        int expectedLiseSize = 0;
+        int actualListSize = events.size();
+        assertEquals(expectedLiseSize, actualListSize);
+
+        userController.plusFriend(user1.getId(), user2.getId(), request);
+
+        events = userController.getUserEvents(user1.getId(), request);
+
+        expectedLiseSize = 1;
+        actualListSize = events.size();
+        assertEquals(expectedLiseSize, actualListSize);
+
+        Event event = events.get(0);
+
+        int expectedUserId = 1;
+        int expectedEventId = 1;
+        EventType expectedEventType = EventType.FRIEND;
+        Operation expectedOperation = Operation.ADD;
+
+        assertEquals(expectedUserId, event.getUserId());
+        assertEquals(expectedEventId, event.getEventId());
+        assertEquals(expectedEventType, event.getEventType());
+        assertEquals(expectedOperation, event.getOperation());
     }
 }
